@@ -79,24 +79,24 @@ A cancellation PR also renames unrelated patient fields, restructures unrelated 
 
 GitHub Copilot says: "Looks good; tests pass."
 
-- Missing evidence: No evaluation of architectural layer boundary violations, no verification of edge-case test coverage (e.g., status transition invariants), and no confirmation that persistence remains decoupled.
+- Missing evidence: There was no check for whether the architectural layers were being used correctly, no review of whether unusual or edge-case scenarios were properly tested such as rules for changing statuses, and no confirmation that the data storage layer remained independent from the rest of the system.
 - Follow-up review question 1: Are there unit tests verifying that attempting to cancel an already completed appointment?
-- Follow-up review question 2: [response]
-- Follow-up review question 3: [response]
-- Follow-up review question 4: [response]
-- Follow-up review question 5: [response]
-- Additional questions if useful: [response]
+- Follow-up review question 2: How would the system be affected if SmartCareDataStore were replaced with a database backed repository implementation?
+- Follow-up review question 3: How do the lookup methods enforce the documented requirement to raise ValueError for blank or invalid IDs?
+- Follow-up review question 4: Was the unimplemented list_practitioner_appointments() method identified during testing, and how would its absence affect system functionality?
+- Follow-up review question 5: How was the separation of responsibilities between the service layer, domain objects, and persistence layer validated during the review?
+- Additional questions if useful: no
 
 ## E Team workflow agreement
 
 | Practice | Team agreement |
 |---|---|
-| Branch naming | [response] |
-| Commit message convention | [response] |
-| PR size | [response] |
-| Another-member review requirement | [response] |
-| Merge rule | [response] |
-| Significant Copilot disclosure rule | [response] |
+| Branch naming | Creating own isolate branch and each branch only apply single or simple tasks |
+| Commit message convention | clear and simple description of tasks, what has been done |
+| PR size | keep samll and focused |
+| Another-member review requirement | Yes, team member should can review each others |
+| Merge rule | Team leader confirms no conflit and merge to Main, then team member should delete own branch and push |
+| Significant Copilot disclosure rule | AI-generated contents should logged in the PR description and verified by a human. |
 
 ## F Issue and backlog index
 
