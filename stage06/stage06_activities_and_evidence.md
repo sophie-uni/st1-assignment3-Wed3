@@ -5,7 +5,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
 - Members, GitHub usernames and cohorts: Sophie Jiang (`sophie-uni`, Postgraduate/G-level)
 - Repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
-- Starting SHA: e9ffe58f51386b9d07fbb753db398838e1ed4241
+- Starting SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
 
 ## A Requirement to issue activities
 
@@ -29,7 +29,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
   - Returns the exact stored Patient instance on success.
   - Peer code review completed and merged via pull request into main branch in Github.
 - Owner: Sophie Jiang
-- Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/1
+- Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/2
 
 ### FR-06 Appointment Cancellation with FR-07 retained history
 
@@ -51,7 +51,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
   - History retention verified: data store retains the cancelled appointment record.
   - Peer code review completed and merged into main in Github.
 - Owner: Sophie Jiang
-- Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/2
+- Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/3
 
 ## B Commit quality
 
@@ -67,17 +67,20 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 
 A cancellation PR also renames unrelated patient fields, restructures unrelated code and adds a new dependency.
 
-- Scope concerns: [response]
-- Responsibility and architecture concerns: [response]
-- Testing and review concerns: [response]
-- Changes to remove or separate, with reasons: [response]
+- Scope concerns: The PR violates the single-purpose review boundary. Combining unrelated code with feature work inflates review complexity, increases merge conflict risk, and obscures the feature's true diff.
+- Responsibility and architecture concerns: Adding a new dependency without architectural justification risks coupling the system unnecessarily. Renaming core fields in the patient entity within an appointment PR crosses bounded context responsibilities.
+- Testing and review concerns: Reviewers cannot easily determine if test failures are due to the cancellation logic or unintended side effects of the patient field renaming. It requires verifying unrelated regression paths.
+- Changes to remove or separate, with reasons:
+  - *Remove patient field renaming:* Extract into a separate refactoring issue and PR so impact on existing queries can be evaluated independently. 
+  - *Remove architectural restructuring of unrelated files:* Keep changes strictly confined to domain, and its repository. 
+  - *Remove new dependency:* Revert and evaluate whether standard library constructs satisfy current requirements without third-party libraries.
 
 ## D Challenge a weak Copilot review
 
 GitHub Copilot says: "Looks good; tests pass."
 
-- Missing evidence: [response]
-- Follow-up review question 1: [response]
+- Missing evidence: No evaluation of architectural layer boundary violations, no verification of edge-case test coverage (e.g., status transition invariants), and no confirmation that persistence remains decoupled.
+- Follow-up review question 1: Are there unit tests verifying that attempting to cancel an already completed appointment?
 - Follow-up review question 2: [response]
 - Follow-up review question 3: [response]
 - Follow-up review question 4: [response]
@@ -212,7 +215,7 @@ Human understanding of domain rules and requirements must drive all design and r
 
 ## M Completion and handover
 
-- Starting SHA: e9ffe58f51386b9d07fbb753db398838e1ed4241
+- Starting SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
 - Final Stage 6 code SHA: [response]
 - Test command: [response]
 - Working directory: /st1-assignment3-Wed3
