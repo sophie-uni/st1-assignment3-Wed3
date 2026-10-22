@@ -10,7 +10,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 ## A Requirement to issue activities
 
 ### FR-02 Patient Search
-
+(Hassan)
 - Title: FR-02 Patient Search: find a registered patient by patient ID
 - Context: Patients are registered through PatientService and held in the shared SmartCareDataStore, but PatientService.find_patient still raises NotImplementedError. Booking and appointment workflows need a reliable way to retrieve the exact patient record that was registered, and to be told clearly when an ID is invalid or not registered.
 - Requirement: FR-02 Patient Search. PatientService.find_patient(patient_id) returns the actual Patient object held in SmartCareDataStore. Patient IDs are strings, trimmed, non-blank and case-sensitive. An invalid or blank ID raises ValueError; a valid ID that is not registered raises LookupError. A lookup never creates a replacement object or returns a different record.
@@ -25,6 +25,8 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Scope: In scope: implementing PatientService.find_patient in project/smartcare/services.py by reusing the store's existing validation and find method, and adding focused tests to project/tests/test_services.py. Out of scope: name, partial or fuzzy search; authentication or access control; changes to Patient fields, domain.py or data_store.py; the supplied query and menu TODOs reserved for a later stage; new dependencies.
 - Definition of Done: Every acceptance criterion is shown by a meaningful assertion in tests/test_services.py. `python -m pytest` run from project/ passes, including the eight supplied tests, and `python main.py` still runs. The diff touches only the scoped files. The PR links this issue, records the test command and observed result, and discloses significant Copilot assistance. Another member has reviewed the actual diff, all feedback is resolved and approval is given on the latest commit. The PR is merged to main, this issue is closed, every member has pulled main and rerun the suite, and the tested code SHA is recorded.
 - Owner: Hassan
+
+(Sophie)
 - Title: Implement Stored Patient Lookup by ID with Exception Handling in PatientService class in servives.py
 - Context: Clinic workflows require retrieving existing, verified patient records by their unique identifier without silently substituting missing patients or accepting malformed query keys.
 - Requirement: Implement find_patient(self, patient_id: str) -> Patient to return the stored Patient entity corresponding to a valid ID. The method must validate the input format and enforce strict error signaling for invalid keys or missing records rather than creating a replacement patient.
@@ -46,7 +48,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/2
 
 ### FR-06 Appointment Cancellation with FR-07 retained history
-
+(Hassan)
 - Title: FR-06/FR-07 Appointment Cancellation: cancel a scheduled appointment and retain it as cancelled history
 - Context: Appointments can already be booked, looked up and conflict-checked, and Appointment provides a guarded cancel transition in the domain layer. AppointmentService.cancel_appointment still raises NotImplementedError, so cancellation is not available through the service layer. Clinic history depends on cancelled appointments staying in the store rather than being removed or replaced.
 - Requirement: FR-06 allows an appointment to be cancelled only while its status is SCHEDULED. FR-07 requires a cancelled appointment to hold CANCELLED status and remain retrievable as part of appointment history. AppointmentService.cancel_appointment(appointment_id) locates the stored appointment, applies the transition through Appointment.cancel and returns that same object. An unknown ID raises LookupError; a blank or invalid ID raises ValueError. Repeated cancellation, or cancellation of a COMPLETED appointment, raises ValueError without changing state.
@@ -62,6 +64,8 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Scope: In scope: implementing AppointmentService.cancel_appointment in project/smartcare/services.py so that it finds the stored appointment and delegates the state change to Appointment.cancel, plus focused tests in project/tests/test_services.py. Out of scope: deleting, archiving or recreating appointments; rescheduling; cancellation reasons, timestamps or notifications; changes to AppointmentStatus, Appointment.cancel or other domain rules; any change to how cancelled appointments affect conflict checking unless confirmed with the tutor; unrelated renames, restructuring or new dependencies.
 - Definition of Done: Every acceptance criterion is shown by a meaningful assertion, including unchanged state after each failure. The diff shows the status changing only through Appointment.cancel, with no direct assignment to protected state, no deletion and no replacement record. `python -m pytest` run from project/ passes, including the eight supplied tests, and `python main.py` still runs. The PR links this issue, records the test command and observed result, and discloses significant Copilot assistance. Another member has reviewed the actual diff and approved the latest commit after all feedback is resolved. The PR is merged to main, this issue is closed, every member has pulled main and rerun the suite, and the tested code SHA is recorded.
 - Owner: Hassan
+
+(Sophie)
 - Title: Implement Appointment Cancellation with Retained History in AppointmentService class in services.py
 - Context: Clinic workflows require booked appointments to be cancelled upon request while maintaining complete historical records for auditing, reporting, and dispute resolution without removing records from storage.
 - Requirement: Implement AppointmentService.cancel_appointment(appointment_id: str) -> Appointment. The method must look up the stored appointment via the shared store, delegate cancellation to the domain object's transition method, ensure the record is retained in the data store, and return the updated appointment object. It must enforce error handling by raising LookupError for unknown or absent IDs and letting domain transition violations raise ValueError without altering appointment state.
@@ -83,7 +87,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/3
 
 ## B Commit quality
-
+(Hassan)
 | Original example                               | Strong or Weak | Reason                                                                                                                                                                                                                                                                       |
 |------------------------------------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | changes                                        | Weak           | Every commit contains changes, so the message says nothing about what changed or why. A reviewer cannot connect it to an issue or requirement, and nobody searching the history later can tell whether this commit is the one they need.                                     |
@@ -91,6 +95,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 | Add patient search by ID                       | Strong         | It is in the imperative, names one specific behaviour and maps directly to FR-02. A reviewer can check that the commit contains only the lookup and its tests. Adding the issue reference, for example "(#1)", would make it fully traceable.                                |
 | fix stuff                                      | Weak           | It names no defect, component or behaviour, and "stuff" implies several unrelated fixes bundled together. The commit cannot be reviewed against a requirement or safely reverted on its own.                                                                                 |
 | Prevent cancellation of completed appointments | Strong         | It states the exact rule being enforced, which is the FR-06 guard that cancellation is only allowed from SCHEDULED. It describes behaviour rather than files, so a reviewer knows to look for the guard and for a test showing that a COMPLETED appointment stays COMPLETED. |
+(Sophie)
 | Original example | Strong or Weak | Reason |
 |---|---|---|
 | changes | Weak | uninformative; not mentioned which files or behaviours were changed and why. |
@@ -175,23 +180,31 @@ Create at least two focused issues. Add a linked practitioner-lookup issue or an
 
 Repeat this block per PR. Record actual events, not planned approvals.
 
-- PR link and title: [response]
-- Linked issue and requirement: [response]
-- Feature branch: [response]
-- Changed behaviour: [response]
-- Meaningful commits: [links]
-- Test command, directory and observed result: [response]
-- Another-member reviewer: [response]
-- Human observations recorded before Copilot: [link and time]
-- Requirement, responsibilities, test assertions and unrelated-scope checks: [response]
-- Key feedback: [response]
-- Author response/change and verification: [response]
-- Reviewer recheck and approval: [link]
-- Merge outcome and SHA: [response]
-- Significant Copilot assistance: [summary or none]
-- Linked issue closure: [response]
-- Each member updated main: [member and confirmation]
-- Integrated verification after merge: [command, directory, result and code SHA]
+- PR link and title: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/4
+- Linked issue and requirement: 
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/3
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/2
+- Feature branch: focus/stage06
+- Changed behaviour: 
+  - class PatientService:
+    - def find_patient(self, patient_id: str) -> Patient
+  - class PractitionerService:
+    - def find_practitioner(self, practitioner_id: str) -> Practitioner
+  - class AppointmentService:
+    - def cancel_appointment(self, appointment_id: str) -> Appointment
+- Meaningful commits: 0ea95707fe7cee704daa839c2e6c8ca5a237901c
+- Test command, directory and observed result: N/A
+- Another-member reviewer: Sophie Jiang
+- Human observations recorded before Copilot: Yes
+- Requirement, responsibilities, test assertions and unrelated-scope checks: Yes
+- Key feedback: N/A
+- Author response/change and verification: N/A
+- Reviewer recheck and approval: N/A
+- Merge outcome and SHA: Merged 75b2a03e3de47edca100dfc8f5522b1933aca787
+- Significant Copilot assistance: None
+- Linked issue closure: both issues closed
+- Each member updated main: Sophie commited
+- Integrated verification after merge: N/A
 
 ## H Copilot collaboration record
 
@@ -220,14 +233,14 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 
 Repeat per member. Include only categories that describe actual work; write not applicable where appropriate. Pairing or mentoring can be supported by a short corroborated note.
 
-- Member: [response]
-- Implementation: [work and evidence]
-- Testing: [work and evidence]
-- Review: [work and evidence]
-- Issue refinement: [work and evidence]
-- Design and responsibility discussion: [work and evidence]
-- Debugging or integration: [work and evidence]
-- Documentation or team support: [work and evidence]
+- Member: Sophie
+- Implementation: FR-02 Patient Search and FR-06 Appointment Cancellation with FR-07 retained history
+- Testing: N/A
+- Review: Sophie
+- Issue refinement: Issues closed
+- Design and responsibility discussion: N/A
+- Debugging or integration: Integration
+- Documentation or team support: Documentation
 
 [TO FILL: repeat this block for each other member]
 
