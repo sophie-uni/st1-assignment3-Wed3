@@ -7,7 +7,7 @@ Baseline: Stage 6 foundation, 2026 revision 2. This starter deliberately leaves 
 
 - Group and tutorial: [complete]
 - Member names, GitHub usernames and UG/PG cohorts: [complete]
-- Shared repository URL: [complete]
+- Shared repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
 - Latest completed stage: [complete]
 - Verified code SHA: [complete]
 - Test command, working directory and observed result: [complete]
