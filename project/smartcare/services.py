@@ -144,7 +144,7 @@ class AppointmentService:
         Return the cancelled object. Unknown IDs raise LookupError;
         invalid transitions raise ValueError and leave state unchanged.
         """
-        appointment = self.find_appointment(appointment_id)
+        appointment = self.data_store.find_appointment(appointment_id)
         appointment.cancel()
         return appointment
 
