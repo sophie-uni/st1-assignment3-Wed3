@@ -3,7 +3,7 @@
 Complete this one group record. Link actual issues, diffs, tests and reviews; avoid copying entire histories. Blank fields are intentional. Duplicate rows as needed. Use synthetic data only. Every member records their own meaningful contribution. Do not invent results, reviews or Copilot use.
 
 - Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
-- Members, GitHub usernames and cohorts: Sophie Jiang (`sophie-uni`, Postgraduate/G-level),Hassan Ahmad, Devam, Trung Heiu
+- Members, GitHub usernames and cohorts: Sophie Jiang (`sophie-uni`, Postgraduate/G-level),Hassan Ahmad (`hassan-ahmad-001`, Undergraduate), Devam, Trung Heiu
 - Repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
 - Starting SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
 
@@ -67,7 +67,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 3. Existing tests for patient lookup pass.
 4. No fuzzy or implicit matching is introduced beyond the specified requirements.
 
-- Owner: \[insert name/role\]; Actual issue link: \[response\]
+- Owner: Hassan; Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/6#issue-5980074979
 
 ### FR-06 Appointment Cancellation with FR-07 retained history
 (Sophie)
@@ -124,7 +124,7 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
   - Historical records remain available after cancellation.
   - Validation for invalid state transitions is implemented.
   - Existing tests for appointment cancellation and retrieval pass.
-- Actual issue link: \[response\]
+- Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/6#issue-5980074979
 
 ## B Commit quality
 
@@ -199,7 +199,7 @@ GitHub Copilot says: "Looks good; tests pass."
 - Follow-up review question 5: How was the separation of responsibilities between the service layer, domain objects, and persistence layer validated during the review?
 - Additional questions if useful: no
 
-(Hasshan)
+(Hassan)
 - Missing evidence: The response does not say which requirement or acceptance criteria were checked, and it cites no diff lines. Copilot cannot run tests by reading a diff, so "tests pass" has no command, working directory, observed output or commit SHA behind it. It says nothing about which tests exist or what they assert, whether the status change goes through Appointment.cancel rather than direct assignment, deletion or a replacement record, how error paths behave and whether state is unchanged after a failure, whether the supplied tests are untouched, or whether the diff contains unrelated changes. It is an approval claim with no supporting evidence.
 - Follow-up review question 1: Which FR-06 and FR-07 acceptance criteria did you check, and which specific diff lines satisfy each one?
 - Follow-up review question 2: What test command was run, from which directory, against which commit SHA, and what was the observed output? If no run was observed, what is the claim "tests pass" based on?
@@ -248,7 +248,7 @@ Additional questions if useful:
 | Merge rule | Team leader confirms no conflit and merge to Main, then team member should delete own branch and push |
 | Significant Copilot disclosure rule | AI-generated contents should logged in the PR description and verified by a human. |
 
-(Hasshan)
+(Hassan)
 | Practice                            | Team agreement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Branch naming                       | `<type>/<issue-number>-<short-description>` in lowercase kebab-case, for example `feature/1-patient-search`, `feature/2-cancel-appointment` or `fix/5-lookup-whitespace`. One branch per issue, always created from freshly pulled main. No feature work is committed directly to main.                                                                                                                                                                                                                                          |
@@ -314,6 +314,25 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - Linked issue closure: both issues closed
 - Each member updated main: Sophie commited
 - Integrated verification after merge: N/A
+
+- PR link and title: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/6/changes/266e708c5289de192543f6e0fd3436a5c7345478
+- Linked issue and requirement: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/6#issue-5980074979
+- Feature branch: stage06/a
+- Changed behaviour: N/A
+- Meaningful commits: 266e708c5289de192543f6e0fd3436a5c7345478
+- Test command, directory and observed result: N/A
+- Another-member reviewer: Sophie
+- Human observations recorded before Copilot: Yes
+- Requirement, responsibilities, test assertions and unrelated-scope checks: N/A
+- Key feedback: N/A
+- Author response/change and verification: N/A
+- Reviewer recheck and approval: N/A
+- Merge outcome and SHA: Merged 471ea3a0bb51272693933afd691c4955ca701cd4
+- Significant Copilot assistance: None
+- Linked issue closure: issue closed
+- Each member updated main: Hassan Commited
+- Integrated verification after merge: N/A
+
 
 - PR link and title: \[response\]
 - Linked issue and requirement: \[response\]
@@ -409,6 +428,16 @@ Repeat per member. Include only categories that describe actual work; write not 
 - Debugging or integration: Fixed invalid transition handling and unknown-ID behaviour by checking the service contract against the actual domain and store logic. Evidence: targeted test corrections and pass/fail results.
 - Documentation or team support: Recorded the requirement traceability and the test evidence for the Stage 6 work, keeping the implementation linked to FR-02 and FR-06/FR-07.
 
+- Member: Hassan
+- Implementation: Done
+- Testing: N/A
+- Review: Sophie
+- Issue refinement: Issue Closed
+- Design and responsibility discussion: N/A
+- Debugging or integration: Integration
+- Documentation or team support: Documentation
+
+
 ## K Exit question
 
 Why is a high commit count not necessarily evidence of strong contribution?
@@ -442,7 +471,7 @@ In this project, contribution quality is judged by:
 1. What is version control?
 (Sophie)
 A system that tracks changes to files over time, enabling multiple developers to collaborate, inspect revision histories, revert to previous states, and maintain parallel lines of development safely.
-(Hasshan)
+(Hassan)
 Version control is a system that records changes to files over time as a history of commits, so a team can see who changed what, when and why, compare versions and return to an earlier state. Git is distributed, so every clone holds the full history, and GitHub hosts the shared remote repository that the team pushes to and pulls from. It allows several people to work on the same project in parallel and combine their work safely.
 (Trung)
 🡺 Version control tracks changes to files over time. It lets teams collaborate, compare versions, revert mistakes, and keep a clear history of the project. Git is the most common example.
@@ -450,7 +479,7 @@ Version control is a system that records changes to files over time as a history
 2. Why is a feature branch useful?
 (Sophie)
 It isolates work-in-progress code from the stable `main` branch, allowing developers to build, test, and review new features without breaking production stability or disrupting team members.
-(Hasshan)
+(Hassan)
 A feature branch keeps one focused change separate from main while it is being built, so main stays stable and runnable for everyone. Members can work on different issues at the same time without overwriting each other, and the branch becomes the unit that is reviewed in a pull request. If an approach does not work, the branch can be discarded without affecting main, and the link from issue to branch to PR to merge stays easy to trace.
 (Trung)
 🡺 A feature branch isolates one change from the main branch. It reduces conflict, keeps work focused, and makes review and testing easier before merging.
@@ -458,7 +487,7 @@ A feature branch keeps one focused change separate from main while it is being b
 3. What makes a commit a good engineering commit?
 (Sophie)
 It contains a single logical change, includes a concise imperative commit message describing the intent, leaves the repository in a compiling and testable state, and does not mix unrelated formatting or scope changes.
-(Hasshan)
+(Hassan)
 A good commit contains one coherent, logical change, such as a service method together with its tests, and leaves the code in a working state. It includes only related files, with no unrelated edits, secrets or generated clutter, which is confirmed with `git diff --staged` before committing. Its message describes the behaviour or intention in the imperative and references the issue, and it is small enough to review and revert on its own.
 (Trung)
 🡺 A good commit is small, intentional, and clearly explains a specific change or behaviour. It should match a requirement or test and be easy for others to review.
@@ -466,7 +495,7 @@ A good commit contains one coherent, logical change, such as a service method to
 4. What is a pull request?
 (Sophie)
 A formal proposal to merge changes from a feature branch into a target branch, providing a dedicated space for peer review, continuous integration test verification, and architectural critique.
-(Hasshan)
+(Hassan)
 A pull request is a proposal to merge one branch into another, here a feature branch into main. It shows the diff, commits and linked issue, states what behaviour changed and which tests were run, and gives the team a place to comment, request changes and approve before the change is integrated.
 (Trung)
 🡺 A pull request is a request to merge code from one branch into another. It is a review checkpoint where team members inspect the diff, check requirements, and decide whether the change is ready to merge.
@@ -474,15 +503,15 @@ A pull request is a proposal to merge one branch into another, here a feature br
 5. What is the purpose of code review?
 (Sophie)
 To identify defects, architectural violations, security risks, and maintainability issues early; to ensure adherence to team coding standards and requirements; and to share domain knowledge across the team.
-(Hasshan)
+(Hassan)
 Code review is a check by another person of the actual changed lines before they reach main. The reviewer compares the change with the requirement and acceptance criteria and checks responsibility boundaries, correctness including error paths, the strength of the test assertions, readability and unrelated scope. Review catches defects the author missed, spreads understanding so every member can explain the code, and keeps main stable.
 (Trung)
 🡺 Code review checks correctness, scope, quality, and requirements coverage. It helps catch bugs, design issues, and over-scoped changes before they reach the main branch.
 
-7. What does a Git diff show?
+6. What does a Git diff show?
 (Sophie)
 The exact line-by-line additions, modifications, and deletions between two commits, branches, or between the working tree and the index.
-(Hasshan)
+(Hassan)
 A Git diff shows the line-by-line differences between two states of the files: the working directory against the staging area (`git diff`), the staging area against the last commit (`git diff --staged`), or two commits or branches. Removed lines are marked with `-` and added lines with `+`, grouped into hunks with surrounding context and file names. A diff shows what changed, but not whether the change is correct or why it was made.
 (Trung)
 🡺 A Git diff shows exactly what changed between versions: added, removed, or modified lines. It helps reviewers understand the change and spot unintended edits.
@@ -490,7 +519,7 @@ A Git diff shows the line-by-line differences between two states of the files: t
 7. What is a Definition of Done?
 (Sophie)
 An agreed checklist of criteria that a user story or task must meet before it is considered complete.
-(Hasshan)
+(Hassan)
 A Definition of Done is a shared checklist that every work item must satisfy before the team treats it as complete. It goes beyond "code written" to include demonstrated acceptance criteria, meaningful passing tests including the existing ones, review by another member, resolved feedback, appropriate documentation, and merging with verification of the integrated result. Unlike acceptance criteria, which are specific to one item, the Definition of Done applies to every item.
 (Trung)
 🡺 A Definition of Done is the agreed standard for when a task is complete. It usually includes meeting the requirement, passing relevant tests, code review, and no unresolved issues.
@@ -498,7 +527,7 @@ A Definition of Done is a shared checklist that every work item must satisfy bef
 8. What is the appropriate role of GitHub Copilot in pull-request review?
 (Sophie)
 An auxiliary verification and linting tool that can highlight missed edge cases or syntax improvements. It must never act as the sole approver; human engineering judgment is required to evaluate architectural fit and requirement compliance.
-(Hasshan)
+(Hassan)
 Copilot is an approved assistant, not the reviewer of record. It is consulted only after the human reviewer has recorded independent observations, and it is given the actual requirement, acceptance criteria and diff with synthetic data only. Its summaries, risks and questions are checked against the code, the requirements and an observed test run, then explicitly accepted, modified or rejected and disclosed. Copilot cannot approve a merge, cannot confirm that tests ran, and does not replace another member's review; the team remains accountable for every change.
 (Trung)
 🡺 Copilot can suggest edge cases and review checks, but it should not replace human judgement. Humans must still verify requirements, architecture, scope, and correctness.
@@ -506,7 +535,7 @@ Copilot is an approved assistant, not the reviewer of record. It is consulted on
 9. Why should individual contribution not be judged only by commit count?
 (Sophie)
 Commit frequency does not correlate with complexity or quality. Essential engineering activities, such as architectural design, refactoring, thorough code reviews, mentoring, and writing detailed specifications, do not produce inflated commit metrics.
-(Hasshan)
+(Hassan)
 Commit count measures how often someone committed, not the value, quality or difficulty of the work. Commit habits vary, and important work such as reviewing, testing, refining issues, debugging integration, pairing and mentoring produces few commits, while counts can be inflated by splitting changes artificially. Contribution should be judged from traceable evidence such as linked issues, authored diffs, meaningful tests, review comments that changed the code and integration results.
 (Trung)
 🡺 Commit count measures volume, not value. A small number of well-scoped, correct, tested changes can be more valuable than a large number of weak or unrelated commits.
@@ -514,7 +543,7 @@ Commit count measures how often someone committed, not the value, quality or dif
 10. What is the Stage 6 engineering rule?
 (Sophie)
 Human understanding of domain rules and requirements must drive all design and refactoring decisions, using AI only to review or assist, followed by rigorous test verification.
-(Hasshan)
+(Hassan)
 No change reaches main unless it can be traced from a requirement, through a focused issue and feature branch, to meaningful tests and another member's review of the actual diff, followed by verification of the integrated result on main. Main is kept stable and runnable. Passing tests and Copilot output support this evidence, but they never replace checking the requirement and human review.
 (Trung)
 🡺 The Stage 6 rule is that work must be evidence-based, requirement-linked, reviewed, and scoped. Strong engineering is about correctness, traceability, and collaboration, not just raw commit volume.
