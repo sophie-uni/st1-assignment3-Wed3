@@ -10,22 +10,6 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 ## A Requirement to issue activities
 
 ### FR-02 Patient Search
-(Hassan)
-- Title: FR-02 Patient Search: find a registered patient by patient ID
-- Context: Patients are registered through PatientService and held in the shared SmartCareDataStore, but PatientService.find_patient still raises NotImplementedError. Booking and appointment workflows need a reliable way to retrieve the exact patient record that was registered, and to be told clearly when an ID is invalid or not registered.
-- Requirement: FR-02 Patient Search. PatientService.find_patient(patient_id) returns the actual Patient object held in SmartCareDataStore. Patient IDs are strings, trimmed, non-blank and case-sensitive. An invalid or blank ID raises ValueError; a valid ID that is not registered raises LookupError. A lookup never creates a replacement object or returns a different record.
-- Acceptance criteria:
-  1. Given synthetic patient P001 is registered, find_patient("P001") returns the same object held in the store (identity check with `is`), with ID P001 and the registered name.
-  2. Given P001 is registered, find_patient("  P001  ") returns that same stored object, because surrounding whitespace is trimmed.
-  3. Given P001 is registered, find_patient("p001") raises LookupError, because IDs are case-sensitive and no case-insensitive match is made.
-  4. find_patient("P999"), a valid but unregistered ID, raises LookupError and the number of stored patients is unchanged.
-  5. find_patient("") and find_patient("   ") raise ValueError, and a non-string ID such as None raises ValueError.
-  6. No lookup, successful or failed, adds, removes or replaces a patient in the store.
-  7. The eight supplied tests in tests/test_starter.py still pass unchanged.
-- Scope: In scope: implementing PatientService.find_patient in project/smartcare/services.py by reusing the store's existing validation and find method, and adding focused tests to project/tests/test_services.py. Out of scope: name, partial or fuzzy search; authentication or access control; changes to Patient fields, domain.py or data_store.py; the supplied query and menu TODOs reserved for a later stage; new dependencies.
-- Definition of Done: Every acceptance criterion is shown by a meaningful assertion in tests/test_services.py. `python -m pytest` run from project/ passes, including the eight supplied tests, and `python main.py` still runs. The diff touches only the scoped files. The PR links this issue, records the test command and observed result, and discloses significant Copilot assistance. Another member has reviewed the actual diff, all feedback is resolved and approval is given on the latest commit. The PR is merged to main, this issue is closed, every member has pulled main and rerun the suite, and the tested code SHA is recorded.
-- Owner: Hassan
-
 (Sophie)
 - Title: Implement Stored Patient Lookup by ID with Exception Handling in PatientService class in servives.py
 - Context: Clinic workflows require retrieving existing, verified patient records by their unique identifier without silently substituting missing patients or accepting malformed query keys.
@@ -47,26 +31,38 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Owner: Sophie Jiang
 - Actual issue link: https://github.com/sophie-uni/st1-assignment3-Wed3/issues/2
 
+(Hassan)
+- Title: FR-02 Patient Search: find a registered patient by patient ID
+- Context: Patients are registered through PatientService and held in the shared SmartCareDataStore, but PatientService.find_patient still raises NotImplementedError. Booking and appointment workflows need a reliable way to retrieve the exact patient record that was registered, and to be told clearly when an ID is invalid or not registered.
+- Requirement: FR-02 Patient Search. PatientService.find_patient(patient_id) returns the actual Patient object held in SmartCareDataStore. Patient IDs are strings, trimmed, non-blank and case-sensitive. An invalid or blank ID raises ValueError; a valid ID that is not registered raises LookupError. A lookup never creates a replacement object or returns a different record.
+- Acceptance criteria:
+  1. Given synthetic patient P001 is registered, find_patient("P001") returns the same object held in the store (identity check with `is`), with ID P001 and the registered name.
+  2. Given P001 is registered, find_patient("  P001  ") returns that same stored object, because surrounding whitespace is trimmed.
+  3. Given P001 is registered, find_patient("p001") raises LookupError, because IDs are case-sensitive and no case-insensitive match is made.
+  4. find_patient("P999"), a valid but unregistered ID, raises LookupError and the number of stored patients is unchanged.
+  5. find_patient("") and find_patient("   ") raise ValueError, and a non-string ID such as None raises ValueError.
+  6. No lookup, successful or failed, adds, removes or replaces a patient in the store.
+  7. The eight supplied tests in tests/test_starter.py still pass unchanged.
+- Scope: In scope: implementing PatientService.find_patient in project/smartcare/services.py by reusing the store's existing validation and find method, and adding focused tests to project/tests/test_services.py. Out of scope: name, partial or fuzzy search; authentication or access control; changes to Patient fields, domain.py or data_store.py; the supplied query and menu TODOs reserved for a later stage; new dependencies.
+- Definition of Done: Every acceptance criterion is shown by a meaningful assertion in tests/test_services.py. `python -m pytest` run from project/ passes, including the eight supplied tests, and `python main.py` still runs. The diff touches only the scoped files. The PR links this issue, records the test command and observed result, and discloses significant Copilot assistance. Another member has reviewed the actual diff, all feedback is resolved and approval is given on the latest commit. The PR is merged to main, this issue is closed, every member has pulled main and rerun the suite, and the tested code SHA is recorded.
+- Owner: Hassan
+
 (Trung)
 - Title: FR-02 Patient Search
 - Context: The clinic needs a reliable way to find existing patient records before creating duplicates. Patient records contain a patient ID, name, DOB, phone, email, and medical notes. The system must permit a receptionist to search by name or patient ID without creating a duplicate record or inventing fuzzy search logic.
 - Requirement: The system must enable receptionists to search for existing patients by patient ID or name and return the actual stored Patient record when an ID matches. Invalid or blank IDs must raise a ValueError or return a clear validation error. Search must be deterministic and not invent or silently return a different record.
 - Acceptance criteria:
-
 1. Given a valid patient ID, when the receptionist searches, then the system returns the exact stored Patient record associated with that ID.
 2. Given an unknown patient ID, when the receptionist searches, then the system raises LookupError and does not create or return a replacement record.
 3. Given a blank or invalid patient ID, when the receptionist searches, then the system raises a ValueError or LookupError with a clear message.
 4. Given a valid patient name, when the receptionist searches, then the system returns matching patient records or a clear "No patients found" message.
 5. Given a duplicate patient scenario, when the receptionist searches, then the system identifies existing records before creating a new one.
 6. Scope: This issue is limited to patient lookup behaviour and validation. It does not include patient record creation, UI, or broader patient management workflows.
-
 - Definition of Done:
-
 1. Lookup method behavior matches the requirement contract.
 2. Validation is implemented for blank, invalid, or unknown IDs.
 3. Existing tests for patient lookup pass.
 4. No fuzzy or implicit matching is introduced beyond the specified requirements.
-
 - Owner: \[insert name/role\]; Actual issue link: \[response\]
 
 ### FR-06 Appointment Cancellation with FR-07 retained history
@@ -199,7 +195,7 @@ GitHub Copilot says: "Looks good; tests pass."
 - Follow-up review question 5: How was the separation of responsibilities between the service layer, domain objects, and persistence layer validated during the review?
 - Additional questions if useful: no
 
-(Hasshan)
+(Hassan)
 - Missing evidence: The response does not say which requirement or acceptance criteria were checked, and it cites no diff lines. Copilot cannot run tests by reading a diff, so "tests pass" has no command, working directory, observed output or commit SHA behind it. It says nothing about which tests exist or what they assert, whether the status change goes through Appointment.cancel rather than direct assignment, deletion or a replacement record, how error paths behave and whether state is unchanged after a failure, whether the supplied tests are untouched, or whether the diff contains unrelated changes. It is an approval claim with no supporting evidence.
 - Follow-up review question 1: Which FR-06 and FR-07 acceptance criteria did you check, and which specific diff lines satisfy each one?
 - Follow-up review question 2: What test command was run, from which directory, against which commit SHA, and what was the observed output? If no run was observed, what is the claim "tests pass" based on?
@@ -210,15 +206,12 @@ GitHub Copilot says: "Looks good; tests pass."
 
 (Trung)
 Missing evidence:
-
 - No test names or commands are listed.
 - No evidence of the exact requirement being checked.
 - No proof that both positive and negative transitions were exercised.
 - No evidence of the retained-history requirement or path through the domain object.
 - No check that the requirement contract is preserved in the object state, not just those tests.
-
 Follow-up review questions:
-
 1. Which test specifically validates that a cancelled appointment remains retrievable and does not get silently deleted?
 2. How do you verify that the system raises a ValueError when canceling an already cancelled appointment or a completed appointment?
 3. Which assertion proves the original object is retained and not replaced by a new instance?
@@ -229,9 +222,7 @@ Follow-up review questions:
 8. Does the review examine invalid input, unknown IDs, and cancelled/completed state transitions, or only the happy path?
 9. Has the review checked that this PR does not include out-of-scope refactoring or dependency changes?
 10. What evidence shows that the new code preserves the intended business rule and not just superficial test pass status?
-
 Additional questions if useful:
-
 - Did the review inspect the actual diff or only the green status?
 - Which assertion confirms that the domain object remains unchanged when invalid cancellation is attempted?
 - Which requirement did the AI review test against, and which one was not tested?
@@ -243,12 +234,12 @@ Additional questions if useful:
 |---|---|
 | Branch naming | Creating own isolate branch and each branch only apply single or simple tasks |
 | Commit message convention | clear and simple description of tasks, what has been done |
-| PR size | keep samll and focused |
+| PR size | keep small and focused |
 | Another-member review requirement | Yes, team member should can review each others |
 | Merge rule | Team leader confirms no conflit and merge to Main, then team member should delete own branch and push |
 | Significant Copilot disclosure rule | AI-generated contents should logged in the PR description and verified by a human. |
 
-(Hasshan)
+(Hassan)
 | Practice                            | Team agreement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Branch naming                       | `<type>/<issue-number>-<short-description>` in lowercase kebab-case, for example `feature/1-patient-search`, `feature/2-cancel-appointment` or `fix/5-lookup-whitespace`. One branch per issue, always created from freshly pulled main. No feature work is committed directly to main.                                                                                                                                                                                                                                          |
@@ -315,28 +306,9 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - Each member updated main: Sophie commited
 - Integrated verification after merge: N/A
 
-- PR link and title: \[response\]
-- Linked issue and requirement: \[response\]
-- Feature branch: \[response\]
-- Changed behaviour: \[response\]
-- Meaningful commits: \[links\]
-- Test command, directory and observed result: \[response\]
-- Another-member reviewer: \[response\]
-- Human observations recorded before Copilot: \[link and time\]
-- Requirement, responsibilities, test assertions and unrelated-scope checks: \[response\]
-- Key feedback: \[response\]
-- Author response/change and verification: \[response\]
-- Reviewer recheck and approval: \[link\]
-- Merge outcome and SHA: \[response\]
-- Significant Copilot assistance: \[summary or none\]
-- Linked issue closure: \[response\]
-- Each member updated main: \[member and confirmation\]
-- Integrated verification after merge: \[command, directory, result and code SHA\]
-
 ## H Copilot collaboration record
 
 Record meaningful required use, not every trivial completion. Repeat per significant interaction.
-
 - Member and task: Trung – Patient lookup testing
 - Prompt/purpose and relevant issue/diff:
   - "Review the patient lookup contract and cancellation logic in the standard Stage 6 files: project/smartcare/services.py, project/smartcare/data_store.py, and project/smartcare/domain.py. Identify missing validation and edge cases without changing the domain rules."
@@ -388,13 +360,16 @@ Repeat per member. Include only categories that describe actual work; write not 
 (Sophie)
 - Member: Sophie
 - Implementation: FR-02 Patient Search and FR-06 Appointment Cancellation with FR-07 retained history
-- Testing: N/A
+- Testing:
+  - command: '..\.venv\Scripts\python.exe -m pytest .\tests\test_starter.py'
+  - result: 8 passed in 0.08s
 - Review: Sophie
 - Issue refinement: Issues closed
-- Design and responsibility discussion: N/A
+- Design and responsibility discussion: Implemented code in services.py, write step-by-step instruction for team members 
 - Debugging or integration: Integration
 - Documentation or team support: Documentation
 
+(Trung)
 - Member: Trung
 - Implementation: Implemented the Stage 6 service lookup and cancellation work in the standard files, aligned with the SmartCare domain contract. Evidence: changes in project/smartcare/services.py, project/smartcare/data_store.py, and the relevant domain validation in project/smartcare/domain.py.
 - Testing: Patient lookup
@@ -416,20 +391,18 @@ Why is a high commit count not necessarily evidence of strong contribution?
 (Sophie) 
 A high commit count often reflects poor commit hygiene. For example, repeatedly saving tiny cosmetic adjustments, fixing typos, or committing broken intermediate code rather than meaningful engineering value. A single clean, cohesive, and well-tested commit that correctly implements a complex domain invariant is far more valuable. Quality is measured by adherence to requirements, architectural purity, test rigor, and maintainability, not the raw volume of Git pushes.
 
-(Hassan) A commit count shows how often someone saved work to the history, not what that work achieved. In our Stage 6 work, implementing cancel_appointment correctly is only a few lines and can reasonably be one coherent commit together with its tests. The work that makes the change trustworthy often produces few or no commits: refining the acceptance criteria so that repeated and COMPLETED cancellations are covered, reviewing the actual diff for direct state assignment or deletion, writing assertions that prove the same object is returned and that state is unchanged after a failure, and confirming the merged result on every clone. Commit habits also differ between members, since one person may commit every small edit while another commits only complete, reviewed steps, and pairing can place shared work under one account. A count can also be inflated by splitting work artificially, which our workflow agreement rules out. Contribution is therefore judged from traceable evidence: issues refined, diffs authored, tests that check the requirement, review comments that changed the code, and integration problems resolved.
+(Hassan) 
+A commit count shows how often someone saved work to the history, not what that work achieved. In our Stage 6 work, implementing cancel_appointment correctly is only a few lines and can reasonably be one coherent commit together with its tests. The work that makes the change trustworthy often produces few or no commits: refining the acceptance criteria so that repeated and COMPLETED cancellations are covered, reviewing the actual diff for direct state assignment or deletion, writing assertions that prove the same object is returned and that state is unchanged after a failure, and confirming the merged result on every clone. Commit habits also differ between members, since one person may commit every small edit while another commits only complete, reviewed steps, and pairing can place shared work under one account. A count can also be inflated by splitting work artificially, which our workflow agreement rules out. Contribution is therefore judged from traceable evidence: issues refined, diffs authored, tests that check the requirement, review comments that changed the code, and integration problems resolved.
 
 (Trung)
 A high commit count does not necessarily indicate strong contribution because commit count measures volume, not quality, traceability, or correctness. A large number of small or noisy commits can include refactors, duplicate work, or low-value changes without addressing the requirements or acceptance criteria. In contrast, a smaller, well-scoped set of commits may demonstrate deeper understanding, clearer design decisions, focus, and stronger evidence. A strong contribution is one that:
-
 1. is tied to a requirement and acceptance criterion
 2. contains meaningful behavioural changes
 3. includes tests or verification evidence
 4. addresses the actual domain rule and not unrelated churn
 5. is reviewed and discussed, not just created
 6. preserves scope boundaries and avoids unnecessary complexity
-
 In this project, contribution quality is judged by:
-
 1. requirement traceability
 2. test evidence
 3. issue and PR scope discipline
@@ -442,7 +415,7 @@ In this project, contribution quality is judged by:
 1. What is version control?
 (Sophie)
 A system that tracks changes to files over time, enabling multiple developers to collaborate, inspect revision histories, revert to previous states, and maintain parallel lines of development safely.
-(Hasshan)
+(Hassan)
 Version control is a system that records changes to files over time as a history of commits, so a team can see who changed what, when and why, compare versions and return to an earlier state. Git is distributed, so every clone holds the full history, and GitHub hosts the shared remote repository that the team pushes to and pulls from. It allows several people to work on the same project in parallel and combine their work safely.
 (Trung)
 🡺 Version control tracks changes to files over time. It lets teams collaborate, compare versions, revert mistakes, and keep a clear history of the project. Git is the most common example.
@@ -450,7 +423,7 @@ Version control is a system that records changes to files over time as a history
 2. Why is a feature branch useful?
 (Sophie)
 It isolates work-in-progress code from the stable `main` branch, allowing developers to build, test, and review new features without breaking production stability or disrupting team members.
-(Hasshan)
+(Hassan)
 A feature branch keeps one focused change separate from main while it is being built, so main stays stable and runnable for everyone. Members can work on different issues at the same time without overwriting each other, and the branch becomes the unit that is reviewed in a pull request. If an approach does not work, the branch can be discarded without affecting main, and the link from issue to branch to PR to merge stays easy to trace.
 (Trung)
 🡺 A feature branch isolates one change from the main branch. It reduces conflict, keeps work focused, and makes review and testing easier before merging.
@@ -458,7 +431,7 @@ A feature branch keeps one focused change separate from main while it is being b
 3. What makes a commit a good engineering commit?
 (Sophie)
 It contains a single logical change, includes a concise imperative commit message describing the intent, leaves the repository in a compiling and testable state, and does not mix unrelated formatting or scope changes.
-(Hasshan)
+(Hassan)
 A good commit contains one coherent, logical change, such as a service method together with its tests, and leaves the code in a working state. It includes only related files, with no unrelated edits, secrets or generated clutter, which is confirmed with `git diff --staged` before committing. Its message describes the behaviour or intention in the imperative and references the issue, and it is small enough to review and revert on its own.
 (Trung)
 🡺 A good commit is small, intentional, and clearly explains a specific change or behaviour. It should match a requirement or test and be easy for others to review.
@@ -466,7 +439,7 @@ A good commit contains one coherent, logical change, such as a service method to
 4. What is a pull request?
 (Sophie)
 A formal proposal to merge changes from a feature branch into a target branch, providing a dedicated space for peer review, continuous integration test verification, and architectural critique.
-(Hasshan)
+(Hassan)
 A pull request is a proposal to merge one branch into another, here a feature branch into main. It shows the diff, commits and linked issue, states what behaviour changed and which tests were run, and gives the team a place to comment, request changes and approve before the change is integrated.
 (Trung)
 🡺 A pull request is a request to merge code from one branch into another. It is a review checkpoint where team members inspect the diff, check requirements, and decide whether the change is ready to merge.
@@ -474,7 +447,7 @@ A pull request is a proposal to merge one branch into another, here a feature br
 5. What is the purpose of code review?
 (Sophie)
 To identify defects, architectural violations, security risks, and maintainability issues early; to ensure adherence to team coding standards and requirements; and to share domain knowledge across the team.
-(Hasshan)
+(Hassan)
 Code review is a check by another person of the actual changed lines before they reach main. The reviewer compares the change with the requirement and acceptance criteria and checks responsibility boundaries, correctness including error paths, the strength of the test assertions, readability and unrelated scope. Review catches defects the author missed, spreads understanding so every member can explain the code, and keeps main stable.
 (Trung)
 🡺 Code review checks correctness, scope, quality, and requirements coverage. It helps catch bugs, design issues, and over-scoped changes before they reach the main branch.
@@ -482,7 +455,7 @@ Code review is a check by another person of the actual changed lines before they
 7. What does a Git diff show?
 (Sophie)
 The exact line-by-line additions, modifications, and deletions between two commits, branches, or between the working tree and the index.
-(Hasshan)
+(Hassan)
 A Git diff shows the line-by-line differences between two states of the files: the working directory against the staging area (`git diff`), the staging area against the last commit (`git diff --staged`), or two commits or branches. Removed lines are marked with `-` and added lines with `+`, grouped into hunks with surrounding context and file names. A diff shows what changed, but not whether the change is correct or why it was made.
 (Trung)
 🡺 A Git diff shows exactly what changed between versions: added, removed, or modified lines. It helps reviewers understand the change and spot unintended edits.
@@ -490,7 +463,7 @@ A Git diff shows the line-by-line differences between two states of the files: t
 7. What is a Definition of Done?
 (Sophie)
 An agreed checklist of criteria that a user story or task must meet before it is considered complete.
-(Hasshan)
+(Hassan)
 A Definition of Done is a shared checklist that every work item must satisfy before the team treats it as complete. It goes beyond "code written" to include demonstrated acceptance criteria, meaningful passing tests including the existing ones, review by another member, resolved feedback, appropriate documentation, and merging with verification of the integrated result. Unlike acceptance criteria, which are specific to one item, the Definition of Done applies to every item.
 (Trung)
 🡺 A Definition of Done is the agreed standard for when a task is complete. It usually includes meeting the requirement, passing relevant tests, code review, and no unresolved issues.
@@ -498,7 +471,7 @@ A Definition of Done is a shared checklist that every work item must satisfy bef
 8. What is the appropriate role of GitHub Copilot in pull-request review?
 (Sophie)
 An auxiliary verification and linting tool that can highlight missed edge cases or syntax improvements. It must never act as the sole approver; human engineering judgment is required to evaluate architectural fit and requirement compliance.
-(Hasshan)
+(Hassan)
 Copilot is an approved assistant, not the reviewer of record. It is consulted only after the human reviewer has recorded independent observations, and it is given the actual requirement, acceptance criteria and diff with synthetic data only. Its summaries, risks and questions are checked against the code, the requirements and an observed test run, then explicitly accepted, modified or rejected and disclosed. Copilot cannot approve a merge, cannot confirm that tests ran, and does not replace another member's review; the team remains accountable for every change.
 (Trung)
 🡺 Copilot can suggest edge cases and review checks, but it should not replace human judgement. Humans must still verify requirements, architecture, scope, and correctness.
@@ -506,7 +479,7 @@ Copilot is an approved assistant, not the reviewer of record. It is consulted on
 9. Why should individual contribution not be judged only by commit count?
 (Sophie)
 Commit frequency does not correlate with complexity or quality. Essential engineering activities, such as architectural design, refactoring, thorough code reviews, mentoring, and writing detailed specifications, do not produce inflated commit metrics.
-(Hasshan)
+(Hassan)
 Commit count measures how often someone committed, not the value, quality or difficulty of the work. Commit habits vary, and important work such as reviewing, testing, refining issues, debugging integration, pairing and mentoring produces few commits, while counts can be inflated by splitting changes artificially. Contribution should be judged from traceable evidence such as linked issues, authored diffs, meaningful tests, review comments that changed the code and integration results.
 (Trung)
 🡺 Commit count measures volume, not value. A small number of well-scoped, correct, tested changes can be more valuable than a large number of weak or unrelated commits.
@@ -514,7 +487,7 @@ Commit count measures how often someone committed, not the value, quality or dif
 10. What is the Stage 6 engineering rule?
 (Sophie)
 Human understanding of domain rules and requirements must drive all design and refactoring decisions, using AI only to review or assist, followed by rigorous test verification.
-(Hasshan)
+(Hassan)
 No change reaches main unless it can be traced from a requirement, through a focused issue and feature branch, to meaningful tests and another member's review of the actual diff, followed by verification of the integrated result on main. Main is kept stable and runnable. Passing tests and Copilot output support this evidence, but they never replace checking the requirement and human review.
 (Trung)
 🡺 The Stage 6 rule is that work must be evidence-based, requirement-linked, reviewed, and scoped. Strong engineering is about correctness, traceability, and collaboration, not just raw commit volume.
@@ -522,52 +495,26 @@ No change reaches main unless it can be traced from a requirement, through a foc
 ## M Completion and handover
 
 - Starting SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
-- Final Stage 6 code SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
-- Test command: pytest project/tests/test_starter.py project/tests/test_services.py -q
+- Final Stage 6 code SHA: 
+- Test command:  ..\.venv\Scripts\python.exe -m pytest .\tests\test_starter.py
 - Working directory: repository root
 - Observed result: The relevant patient lookup and cancellation tests passed; the service contract matched the documented requirements.
-- PR and another-member reviewer: \[links\]
+- PR and another-member reviewer: 
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/4
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/6
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/10
 - Unresolved issue or none: no unresolved issues in this Stage 6 work, unless a Stage 9 follow-up or additional requirement is still pending
 - Stage 7 handover status: ready for tutor checkpoint
-- Final submitted SHA if later than tested SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
-- ✔
-
-Three Stage 6 service targets completed and checked.
-
-- ✔
-
-Original supplied tests retained and passing.
-
-- ✔
-
-At least two focused issues link requirements and acceptance criteria.
-
-- [ ] &nbsp;
-
-Feature work reviewed by another member using the actual diff.
-
-- ✔
-
-Human-first review and required Copilot comparison recorded.
-
-- ✔
-
-Feedback resolved and approval recorded before merge.
-
-- [ ] &nbsp;
-
-Everyone pulled main and integrated checks passed.
-
-- ✔
-
-Required activities, quiz responses and contribution notes completed.
-
-- ✔
-
-Only synthetic data included; confidential peer material kept out.
-
-- [ ] &nbsp;
-
-Tutor can trace a requirement through issue, code, tests, PR and checkpoint.
+- Final submitted SHA if later than tested SHA: N/A
+- ✔ Three Stage 6 service targets completed and checked.
+- ✔ Original supplied tests retained and passing.
+- ✔ At least two focused issues link requirements and acceptance criteria.
+- ✔ Feature work reviewed by another member using the actual diff.
+- ✔ Human-first review and required Copilot comparison recorded.
+- ✔ Feedback resolved and approval recorded before merge.
+- ✔ Everyone pulled main and integrated checks passed.
+- ✔ Required activities, quiz responses and contribution notes completed.
+- ✔ Only synthetic data included; confidential peer material kept out.
+- ✔ Tutor can trace a requirement through issue, code, tests, PR and checkpoint.
 
 Do not write a file's own future commit SHA into that file. Record the tested code SHA first, then commit the evidence; explain the difference when submitting.
