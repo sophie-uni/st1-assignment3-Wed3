@@ -12,12 +12,12 @@ All Assignment 3 stage materials are provided from the beginning. Complete this 
 
 For each requirement, propose one positive test, one negative test and the key assertion.
 
-| Requirement | Positive test | Negative test | Key assertion | Who |
-|---|---|---|---|---|
-| FR-01 Register patient | [response] | [response] | [response] | Sophie |
-| FR-05 Prevent practitioner conflict | [response] | [response] | [response] | Hassan |
-| FR-06 Cancel appointment | [response] | [response] | [response] | Devam |
-| FR-07 Retain cancelled history | [response] | [response] | [response] | Trung |
+| Requirement                         | Positive test                                                                                                                                | Negative test | Key assertion | Who    |
+|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------|--------|
+| FR-01 Register patient              | [response]                                                                                                                                   | [response]    | [response]   | Sophie |
+| FR-05 Prevent practitioner conflict | Book A1 for practitioner D1 at 2026-10-01 09:00, then book A2 for a different practitioner (D2) at the same time; A2 is stored as SCHEDULED. | With A1 SCHEDULED for D1 at 09:00, book A2 for D1 at exactly 09:00 with a different patient; the booking is rejected with ValueError.    | pytest.raises(ValueError) around the second D1 booking, then data_store.list_appointments() == [first] and first.status is AppointmentStatus.SCHEDULED. Positive case: second.practitioner is the registered D2 and second.status is AppointmentStatus.SCHEDULED    | Hassan |
+| FR-06 Cancel appointment            | [response]                                                                                                                                   | [response]    | [response]   | Devam  |
+| FR-07 Retain cancelled history      | [response]                                                                                                                                   | [response]    | [response]   | Trung  |
 
 ### Activity 2 Strong or weak assertion
 
@@ -25,15 +25,19 @@ For each, select Strong for stated behaviour or Weak/unclear and explain why. St
 (Sophie)
 `assert True`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+
 (Sophie)
 `assert appointment is not None`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+
 (Hassan)
 `assert appointment.status == AppointmentStatus.CANCELLED`
-Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+Judgement: Strong for stated behaviour   Why: After cancelling a SCHEDULED appointment, it checks the exact status required by AC-05.1, so an appointment left SCHEDULED or moved to any other status fails. It does not show that the appointment is the same stored object, that it is still retrievable afterwards (AC-05.2) or that a second cancellation is rejected (AC-05.3). It is only meaningful when appointment is the object returned by the service or found in the shared store, not a separately constructed copy.
+
 (Devam)
 `assert len(results) > 0`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+
 (Trung)
 `assert data_store.find_appointment('A1') is appointment`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
@@ -56,18 +60,18 @@ invalid status transitions
 
 GitHub Copilot generates five tests, all of which pass. Two only assert that objects are not None, one asserts True, and two assume SMS notifications exist. Identify what is wrong and rewrite the test intentions.
 
-| Candidate | What is wrong | Rewritten test intention | Who |
-|---|---|---|---|
-| 1 | [response] | [response] | Sophie none |
-| 2 | [response] | [response] | Sophie none |
-| 3 | [response] | [response] | Hassan True |
-| 4 | [response] | [response] | Devam SMS |
-| 5 | [response] | [response] | Trung SMS |
+| Candidate | What is wrong | Rewritten test intention | Who         |
+|-----------|--------------|--------------------------|-------------|
+| 1         | [response]   | [response]               | Sophie none |
+| 2         | [response]   | [response]               | Sophie none |
+| 3         | assert True passes on every run, even if the operation before it did nothing or did the wrong thing. It only shows that execution reached the last line; it checks no observable result and traces to no criterion.    | With A1 SCHEDULED for D1 at 09:00, attempt to book A2 for D1 at the same time; expect ValueError, then check that A2 was not stored and A1 is still SCHEDULED (FR-05, AC-04.1).               | Hassan True |
+| 4         | [response]   | [response]               | Devam SMS   |
+| 5         | [response]   | [response]               | Trung SMS   |
 
 ### Tutorial exit question
 
 Why can 100% code coverage coexist with poor software verification?
-[response] Hassan
+Coverage only records which lines or branches ran during the tests, not whether the tests checked the right results. A test can call every operation and end with assert True or assert result is not None, reaching 100% coverage while a wrong status, a wrong object or a missing rejection would still pass. Coverage also cannot reveal behaviour that was never written: if the practitioner conflict check were missing entirely, there would be no uncovered line to report. It says nothing about whether the expected values match the requirements or whether the important boundaries were tested.
 
 ## B Requirement to Test Traceability Matrix
 
@@ -116,9 +120,9 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 
 Connect cases to actual contracts and verify unchanged state after rejection.
 
-| Behaviour | Boundary/invalid input | Expected result | Test ID |
-|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] |
+| Behaviour  | Boundary/invalid input | Expected result | Test ID    |
+|------------|------------------------|-----------------|------------|
+| [complete] | [complete]             | [complete]      | [complete] |
 
 ## H GitHub Copilot Test Design
 
@@ -197,14 +201,14 @@ Record actual work in test design, implementation, review, traceability, diagnos
 3. What is a unit test? (sophie)
 [response]
 
-4. What is a pytest fixture? (Hassan)
-[response]
+4. What is a pytest fixture?
+A pytest fixture is a function marked with @pytest.fixture that prepares setup, such as a fresh SmartCareDataStore. pytest calls it and passes its return value to any test that names the fixture as a parameter. With the default function scope, each test receives a new object, so tests do not share state.
 
 5. What is parametrisation in pytest? (Hassan)
-[response]
+Parametrisation (@pytest.mark.parametrize) runs one test function over several input and expected-value sets. pytest collects each set as a separate case with its own result. It suits one behaviour tested with different data, such as checking that both 08:59 and 09:01 are free for the same practitioner. More data sets do not by themselves add new behaviour.
 
 6. What is regression testing? (Hassan)
-[response]
+Regression testing reruns the retained, accumulated test suite after a change to confirm that behaviour which worked before still works. When a defect is found, the test that exposes it stays in the suite so the defect cannot return unnoticed.
 
 7. What does code coverage tell us, and what does it not prove? (Devam)
 [response]
