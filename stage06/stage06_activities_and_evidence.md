@@ -452,7 +452,7 @@ Code review is a check by another person of the actual changed lines before they
 (Trung)
 🡺 Code review checks correctness, scope, quality, and requirements coverage. It helps catch bugs, design issues, and over-scoped changes before they reach the main branch.
 
-7. What does a Git diff show?
+6. What does a Git diff show?
 (Sophie)
 The exact line-by-line additions, modifications, and deletions between two commits, branches, or between the working tree and the index.
 (Hassan)
@@ -495,7 +495,7 @@ No change reaches main unless it can be traced from a requirement, through a foc
 ## M Completion and handover
 
 - Starting SHA: eb03522feb93fa4fe519ebada15cbc063076d79b
-- Final Stage 6 code SHA: 
+- Final Stage 6 code SHA: 3132f8239013c249a032c59fd163ab9da87d5ed6
 - Test command:  ..\.venv\Scripts\python.exe -m pytest .\tests\test_starter.py
 - Working directory: repository root
 - Observed result: The relevant patient lookup and cancellation tests passed; the service contract matched the documented requirements.
