@@ -12,61 +12,73 @@ All Assignment 3 stage materials are provided from the beginning. Complete this 
 
 For each requirement, propose one positive test, one negative test and the key assertion.
 
-| Requirement | Positive test | Negative test | Key assertion |
-|---|---|---|---|
-| FR-01 Register patient | [response] | [response] | [response] |
-| FR-05 Prevent practitioner conflict | [response] | [response] | [response] |
-| FR-06 Cancel appointment | [response] | [response] | [response] |
-| FR-07 Retain cancelled history | [response] | [response] | [response] |
+| Requirement | Positive test | Negative test | Key assertion | Who |
+|---|---|---|---|---|
+| FR-01 Register patient | [response] | [response] | [response] | Sophie |
+| FR-05 Prevent practitioner conflict | [response] | [response] | [response] | Hassan |
+| FR-06 Cancel appointment | [response] | [response] | [response] | Devam |
+| FR-07 Retain cancelled history | [response] | [response] | [response] | Trung |
 
 ### Activity 2 Strong or weak assertion
 
 For each, select Strong for stated behaviour or Weak/unclear and explain why. State the behaviour and limits.
-
+(Sophie)
 `assert True`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
-
+(Sophie)
 `assert appointment is not None`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
-
+(Hassan)
 `assert appointment.status == AppointmentStatus.CANCELLED`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
-
+(Devam)
 `assert len(results) > 0`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
-
+(Trung)
 `assert data_store.find_appointment('A1') is appointment`
 Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
 
 ### Activity 3 Boundary thinking
 
 Design boundary or edge cases for blank identifiers, whitespace-only names, same-time practitioner bookings, cancelled appointments and invalid status transitions.
-For each input/state, expected result and supporting contract: [response]
+For each input/state, expected result and supporting contract:
+(Sophie)
+blank identifiers, whitespace-only names,
+(Hassan)
+same-time practitioner bookings,
+(Devam)
+cancelled appointments
+(Trung)
+invalid status transitions
+[response]
 
 ### Activity 4 Critique GitHub Copilot tests
 
 GitHub Copilot generates five tests, all of which pass. Two only assert that objects are not None, one asserts True, and two assume SMS notifications exist. Identify what is wrong and rewrite the test intentions.
 
-| Candidate | What is wrong | Rewritten test intention |
-|---|---|---|
-| 1 | [response] | [response] |
-| 2 | [response] | [response] |
-| 3 | [response] | [response] |
-| 4 | [response] | [response] |
-| 5 | [response] | [response] |
+| Candidate | What is wrong | Rewritten test intention | Who |
+|---|---|---|---|
+| 1 | [response] | [response] | Sophie none |
+| 2 | [response] | [response] | Sophie none |
+| 3 | [response] | [response] | Hassan True |
+| 4 | [response] | [response] | Devam SMS |
+| 5 | [response] | [response] | Trung SMS |
 
 ### Tutorial exit question
 
 Why can 100% code coverage coexist with poor software verification?
-[response]
+[response] Hassan
 
 ## B Requirement to Test Traceability Matrix
 
 Assign TEST IDs before implementation or generation. Use canonical AC IDs with their actual meaning; quote supporting revision 2 contracts when no canonical AC is assigned. Blank-ID validation is not AC-01.2. Identify supplied versus student-authored evidence.
 
-| Requirement | Acceptance criterion | Test ID | Test type | Test name / location | Expected behaviour | Result / observed status | Supplied or student-authored |
-|---|---|---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| Requirement | Acceptance criterion | Test ID | Test type | Test name / location | Expected behaviour | Result / observed status | Supplied or student-authored | Who |
+|---|---|---|---|---|---|---|---|---|
+| [complete] | [complete] | T-FR01-1 | [complete] | [complete] | [complete] | [complete] | [complete] | Sophie |
+| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Hassan |
+| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Devam |
+| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Trung |
 
 ## C Test Design
 
@@ -111,7 +123,7 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 ## H GitHub Copilot Test Design
 
 Select ONE real acceptance criterion. Complete human-first fields before using Copilot. Do not require an accepted generated test.
-
+(Sophie)
 Requirement: [complete]
 Acceptance criterion: [quote]
 Behaviour to test: [complete]
@@ -132,7 +144,7 @@ For each significant candidate, copy this entry as needed:
 Before accepting: traces to a requirement/criterion; can fail for the right reason; assertion checks required behaviour; no invented business rule; no unnecessary private implementation dependence. Reject/modify weak assertions, invented requirements, excessive mocking, duplicates, wrong exceptions, obsolete architecture and unnecessary dependencies.
 
 ## I Weak Copilot Test Reflection
-
+(Sophie)
 Which Copilot-generated test looked convincing but was weak? [response]
 Why was it weak? [response]
 How did you strengthen it? [response]
@@ -176,34 +188,34 @@ Record actual work in test design, implementation, review, traceability, diagnos
 
 ## N Formative Questions
 
-1. What question does verification answer?
+1. What question does verification answer? (Sophie)
 [response]
 
-2. What question does validation answer?
+2. What question does validation answer? (sophie)
 [response]
 
-3. What is a unit test?
+3. What is a unit test? (sophie)
 [response]
 
-4. What is a pytest fixture?
+4. What is a pytest fixture? (Hassan)
 [response]
 
-5. What is parametrisation in pytest?
+5. What is parametrisation in pytest? (Hassan)
 [response]
 
-6. What is regression testing?
+6. What is regression testing? (Hassan)
 [response]
 
-7. What does code coverage tell us, and what does it not prove?
+7. What does code coverage tell us, and what does it not prove? (Devam)
 [response]
 
-8. What makes an assertion weak?
+8. What makes an assertion weak? (Devam)
 [response]
 
-9. What is the appropriate role of GitHub Copilot as a test assistant?
+9. What is the appropriate role of GitHub Copilot as a test assistant? (Trung)
 [response]
 
-10. What is the Stage 7 engineering rule?
+10. What is the Stage 7 engineering rule? (Trung)
 [response]
 
 ## O Stage Completion
