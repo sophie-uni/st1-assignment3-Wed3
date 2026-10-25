@@ -113,3 +113,39 @@ def test_register_patient_rejects_duplicate_id() -> None:
     assert store.find_patient("P1") is original
     assert original.name == "Sophie Jiang"
     assert store.list_patients() == [original]
+
+
+"""T-FR07"""
+    # T-FR07-3
+def test_blank_patient_id_rejected_by_service() -> None:
+    store = SmartCareDataStore()
+    service = PatientService(store)
+
+    with pytest.raises(ValueError):
+        service.register_patient("", "Alex Example")
+
+    assert store.list_patients() == []
+
+    # T-FR07-4
+def test_new_appointment_starts_scheduled_by_service() -> None:
+    store = SmartCareDataStore()
+    patient_service = PatientService(store)
+    practitioner_service = PractitionerService(store)
+    appointment_service = AppointmentService(store)
+
+    patient_service.register_patient("P1", "Alex Example")
+    practitioner_service.register_practitioner(
+        "D1",
+        "Taylor Example",
+        "General",
+    )
+
+    appointment = appointment_service.book_appointment(
+        "A1",
+        "P1",
+        "D1",
+        datetime(2026, 10, 1, 9, 0),
+    )
+
+    assert appointment.status is AppointmentStatus.SCHEDULED
+    assert store.find_appointment("A1") is appointment
