@@ -145,6 +145,8 @@ class AppointmentService:
         invalid transitions raise ValueError and leave state unchanged.
         """
         appointment = self.data_store.find_appointment(appointment_id)
+        if appointment is None:
+            raise LookupError("Appointment not found")
         appointment.cancel()
         return appointment
 

@@ -14,7 +14,7 @@ from smartcare.services import (
 def test_find_patient_returns_registered_patient() -> None:
     store = SmartCareDataStore()
     service = PatientService(store)
-    patient = service.register_patient("P1", "Alex Example")
+    patient = service.register_patient("P1", "Sophie Jiang")
 
     assert service.find_patient("P1") is patient
 
@@ -30,7 +30,7 @@ def test_find_practitioner_returns_registered_practitioner() -> None:
     store = SmartCareDataStore()
     service = PractitionerService(store)
     practitioner = service.register_practitioner(
-        "D1", "Taylor Example", "General"
+        "D1", "Sophie Doctor", "General"
     )
 
     assert service.find_practitioner("D1") is practitioner
@@ -45,9 +45,9 @@ def test_find_practitioner_raises_for_unknown_id() -> None:
 
 def test_cancel_appointment_returns_and_retains_cancelled_appointment() -> None:
     store = SmartCareDataStore()
-    PatientService(store).register_patient("P1", "Alex Example")
+    PatientService(store).register_patient("P1", "Sophie Jiang")
     PractitionerService(store).register_practitioner(
-        "D1", "Taylor Example", "General"
+        "D1", "Sophie Doctor", "General"
     )
     service = AppointmentService(store)
     appointment = service.book_appointment(
@@ -86,10 +86,30 @@ def test_cancelling_appointment_twice_raises_without_changing_state() -> None:
     assert appointment.status is AppointmentStatus.CANCELLED
     assert store.find_appointment("A1") is appointment
 
-"""Extend the Stage06 service tests"""
-"""check patient and practitioner lookup; 
-valid booking and appointment lookup; 
-practitioner conflicts and valid alternatives; 
-cancellation and retained history. 
-Check duplicate patient, practitioner and appointment IDs do not overwrite the original records. 
-Check unknown participants, invalid values and rejected operations leave the existing state unchanged."""
+"""Stage07 service tests"""
+"""T-FR01-1"""
+"""AC-01.1 - Valid required patient data with an unused ID is stored."""
+def test_register_patient_stores_valid_patient() -> None:
+    store = SmartCareDataStore()
+    service = PatientService(store)
+
+    patient = service.register_patient("P1", "Sophie Jiang")
+
+    assert patient.patient_id == "P1"
+    assert patient.name == "Sophie Jiang"
+    assert store.find_patient("P1") is patient
+    assert store.list_patients() == [patient]
+
+"""T-FR01-2"""
+"""AC-01.2 - Registration with an existing patient ID is rejected."""
+def test_register_patient_rejects_duplicate_id() -> None:
+    store = SmartCareDataStore()
+    service = PatientService(store)
+    original = service.register_patient("P1", "Sophie Jiang")
+
+    with pytest.raises(ValueError):
+        service.register_patient("P1", "David Jiang")
+
+    assert store.find_patient("P1") is original
+    assert original.name == "Sophie Jiang"
+    assert store.list_patients() == [original]

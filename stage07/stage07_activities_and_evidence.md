@@ -14,7 +14,7 @@ For each requirement, propose one positive test, one negative test and the key a
 
 | Requirement                         | Positive test                                                                                                                                | Negative test | Key assertion | Who    |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------|--------|
-| FR-01 Register patient              | [response]                                                                                                                                   | [response]    | [response]   | Sophie |
+| FR-01 Register patient              | Register a valid patient and assert the returned patient is the exact object stored, with its ID and name preserved. | Register a second patient with the same ID and expect ValueError. | Confirm the original remains stored and is the store’s only patient. | Sophie |
 | FR-05 Prevent practitioner conflict | Book A1 for practitioner D1 at 2026-10-01 09:00, then book A2 for a different practitioner (D2) at the same time; A2 is stored as SCHEDULED. | With A1 SCHEDULED for D1 at 09:00, book A2 for D1 at exactly 09:00 with a different patient; the booking is rejected with ValueError.    | pytest.raises(ValueError) around the second D1 booking, then data_store.list_appointments() == [first] and first.status is AppointmentStatus.SCHEDULED. Positive case: second.practitioner is the registered D2 and second.status is AppointmentStatus.SCHEDULED    | Hassan |
 | FR-06 Cancel appointment            | [response]                                                                                                                                   | [response]    | [response]   | Devam  |
 | FR-07 Retain cancelled history      | [response]                                                                                                                                   | [response]    | [response]   | Trung  |
@@ -22,13 +22,16 @@ For each requirement, propose one positive test, one negative test and the key a
 ### Activity 2 Strong or weak assertion
 
 For each, select Strong for stated behaviour or Weak/unclear and explain why. State the behaviour and limits.
+
 (Sophie)
 `assert True`
-Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+Judgement: Weak/unclear 
+Why: It always passes and proves no application behaviour; it cannot catch a wrong result or missing side effect.
 
 (Sophie)
 `assert appointment is not None`
-Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+Judgement: Weak/unclear  
+Why: It proves only that the value isn’t None, not that it is the correct appointment, has the required status, or was stored as expected. It would be strong only if the sole stated requirement were returning any non-None appointment.
 
 (Hassan)
 `assert appointment.status == AppointmentStatus.CANCELLED`
@@ -46,12 +49,18 @@ Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
 
 Design boundary or edge cases for blank identifiers, whitespace-only names, same-time practitioner bookings, cancelled appointments and invalid status transitions.
 For each input/state, expected result and supporting contract:
+
 (Sophie)
-blank identifiers, whitespace-only names,
+blank identifiers, whitespace-only names:
+- Blank identifier: Attempt to register a patient with ID "  " and a valid name. Expect ValueError; assert the patient store remains empty.
+- Whitespace-only name: Attempt to register patient P1 with name " \t\n". Expect ValueError; assert P1 was not stored and the store remains empty.
+
 (Hassan)
 same-time practitioner bookings,
+
 (Devam)
 cancelled appointments
+
 (Trung)
 invalid status transitions
 [response]
@@ -62,8 +71,8 @@ GitHub Copilot generates five tests, all of which pass. Two only assert that obj
 
 | Candidate | What is wrong | Rewritten test intention | Who         |
 |-----------|--------------|--------------------------|-------------|
-| 1         | [response]   | [response]               | Sophie none |
-| 2         | [response]   | [response]               | Sophie none |
+| 1 Weak test: patient = service.register_patient("P1", "Sophie Jiang"); assert patient is not None | It passes even if the patient wasn’t stored or the returned object is incorrect.| Register the patient and verify the returned object is the exact object stored under P1, with the expected ID and name. | Sophie |
+| 2 Weak test: appointment = service.book_appointment("A1", "P1", "D1", valid_time); assert appointment is not None | It doesn’t check the appointment’s identity, participants, time, status, or whether it was stored. | Book the appointment and verify it is stored as A1 with the registered patient and practitioner, requested time, and SCHEDULED status. | Sophie |
 | 3         | assert True passes on every run, even if the operation before it did nothing or did the wrong thing. It only shows that execution reached the last line; it checks no observable result and traces to no criterion.    | With A1 SCHEDULED for D1 at 09:00, attempt to book A2 for D1 at the same time; expect ValueError, then check that A2 was not stored and A1 is still SCHEDULED (FR-05, AC-04.1).               | Hassan True |
 | 4         | [response]   | [response]               | Devam SMS   |
 | 5         | [response]   | [response]               | Trung SMS   |
@@ -79,7 +88,8 @@ Assign TEST IDs before implementation or generation. Use canonical AC IDs with t
 
 | Requirement | Acceptance criterion | Test ID | Test type | Test name / location | Expected behaviour | Result / observed status | Supplied or student-authored | Who |
 |---|---|---|---|---|---|---|---|---|
-| [complete] | [complete] | T-FR01-1 | [complete] | [complete] | [complete] | [complete] | [complete] | Sophie |
+| FR-01 Register patient | AC-01.1 — Valid required patient data with an unused ID is stored. | T-FR01-1 | Positive service test | project/tests/test_services.py::test_register_patient_stores_valid_patient | Register a valid patient; verify the store returns the exact registered object with the expected ID and name. | Planned; not written or run. | Student-authored | Sophie |
+| FR-01 Register patient | AC-01.2 — Registration with an existing patient ID is rejected. | T-FR01-2 | Negative service test | project/tests/test_services.py::test_register_patient_rejects_duplicate_id | Register a patient, then attempt another with the same ID; expect ValueError and verify the original remains stored unchanged. | Planned; not written or run. | Student-authored | Sophie |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Hassan |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Devam |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Trung |
@@ -90,6 +100,10 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 
 | Test ID | Requirement | Acceptance criterion | Positive / Negative / Boundary | Test intention | Observable result expected | Added evidence beyond supplied tests |
 |---|---|---|---|---|---|---|
+| T-FR01-1 | FR-01 Register patient | AC-01.1 - Valid required patient data with an unused ID is stored. | Positive | test_register_patient_stores_valid_patient: register P1, Sophie Jiang in a fresh store. | Lookup returns the exact registered object; ID/name match; the store contains that patient. | Supplied tests use patient registration for setup but do not directly verify successful patient storage and returned object identity. |
+| T-FR01-2 | FR-01 Register patient | AC-01.2 - Registration with an existing patient ID is rejected. | Negative | test_register_patient_rejects_duplicate_id: register P1, then attempt another registration with the same ID and expect ValueError. | The original remains the exact object found under P1; its name is unchanged; the store still contains only the original. | Adds direct evidence that duplicate registration is rejected without overwriting or adding a patient. |
+| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 
 ## D Arrange Act Assert Record
@@ -98,6 +112,11 @@ Arrange test data; act on one meaningful behaviour; assert the required observab
 
 | Test ID | Arrange | Act | Assert | Why meaningful / why assertion proves criterion |
 |---|---|---|---|---|
+| T-FR01-1 | Create a fresh SmartCareDataStore and PatientService. | patient = service.register_patient("P1", "Sophie Jiang") | store.find_patient("P1") is patient; check the expected ID and name; assert store.list_patients() == [patient]. | Verifies valid required data is stored and the returned patient is the stored object, as AC-01.1 requires. |
+| T-FR01-2 | Create a fresh store/service and register original = service.register_patient("P1", "Sophie Jiang"). | with pytest.raises(ValueError): service.register_patient("P1", "David Jiang")| Assert store.find_patient("P1") is original, its name is unchanged, and store.list_patients() == [original]. | Verifies AC-01.2’s duplicate-ID rejection and confirms rejection did not overwrite or add a patient. |
+| [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete] | [complete] | [complete] | [complete] | [complete] |
 | [complete] | [complete] | [complete] | [complete] | [complete] |
 
 ## E Domain Test Evidence
@@ -114,7 +133,8 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 
 | Test ID | Behaviour | Requirement / criterion | Test file/function | Result |
 |---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] |
+| T-FR01-1 | Positive | AC-01.1 - Valid required patient data with an unused ID is stored.| test_register_patient_stores_valid_patient() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
+| T-FR01-2 | Negative | AC-01.2 - Registration with an existing patient ID is rejected. | test_register_patient_rejects_duplicate_id() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
 
 ## G Negative and Boundary Cases
 
@@ -122,37 +142,52 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 
 | Behaviour  | Boundary/invalid input | Expected result | Test ID    |
 |------------|------------------------|-----------------|------------|
+| Negative | Register patient P1, then attempt to register a second patient with ID P1.  | Duplicate IDs are rejected with ValueError. Afterward, assert store.find_patient("P1") is original and store.list_patients() == [original] | T-FR01-2 |
+| [complete] | [complete]             | [complete]      | [complete] |
 | [complete] | [complete]             | [complete]      | [complete] |
 
 ## H GitHub Copilot Test Design
 
 Select ONE real acceptance criterion. Complete human-first fields before using Copilot. Do not require an accepted generated test.
 (Sophie)
-Requirement: [complete]
-Acceptance criterion: [quote]
-Behaviour to test: [complete]
-Human-first test idea/categories: [complete]
-Prompt and purpose: [complete or link]
+Requirement: FR-01 Register patient
+Acceptance criterion: AC-01.2 - Registration with an existing patient ID is rejected.
+Behaviour to test: Negative
+Human-first test idea/categories: Register patient P1 with Name 'Sophie', then register patient P1 again with name 'David', should return error, and P1 remain as 'Sophie'
+Prompt and purpose: Avoid duplicated patient registration
 
 For each significant candidate, copy this entry as needed:
-- Copilot test idea/candidate: [complete]
-- What it claims to verify: [complete]
-- Requirement trace: [complete]
-- Assertion quality: [complete]
-- Human critique: [complete]
-- Decision: [Accept / Modify / Reject]
-- Reason: [complete]
-- Final test reference if accepted/modified: [link or not retained]
-- Actual verification result: [complete; do not claim an unrun test passed]
+- Copilot test idea/candidate: How to avoid duplicated patient registration, what to verify and what requirement trace, how to assertion quality?
+- What it claims to verify: The duplicate attempt raises ValueError, and the original patient remains the exact stored object, unchanged, with no extra patient added.
+- Requirement trace: FR-01, AC-01.2  registration with an existing patient ID is rejected. Use test ID T-FR01-2.
+- Assertion quality: Strong for this criterion—the exception assertion verifies rejection, while the identity and list assertions verify no overwrite or duplicate insertion. Checking only that an object is not None would not prove these behaviours.
+- Human critique: match the requirement, test result is expected
+- Decision: Accept
+- Reason: strong statement and clear steps
+- Final test reference if accepted/modified: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841
+- Actual verification result: complete
 
 Before accepting: traces to a requirement/criterion; can fail for the right reason; assertion checks required behaviour; no invented business rule; no unnecessary private implementation dependence. Reject/modify weak assertions, invented requirements, excessive mocking, duplicates, wrong exceptions, obsolete architecture and unnecessary dependencies.
 
 ## I Weak Copilot Test Reflection
 (Sophie)
-Which Copilot-generated test looked convincing but was weak? [response]
-Why was it weak? [response]
-How did you strengthen it? [response]
-Accepted / modified / rejected test decisions and evidence: [link actual decisions in H]
+Which Copilot-generated test looked convincing but was weak? 
+```
+def test_duplicate_patient_registration_weak() -> None:
+    store = SmartCareDataStore()
+    service = PatientService(store)
+    original = service.register_patient("P1", "Sophie")
+
+    try:
+        service.register_patient("P1", "David")
+    except ValueError:
+        pass
+
+    assert original is not None
+```
+Why was it weak? It passes whether the duplicate registration is correctly rejected or incorrectly accepted. The assertion only checks that the original variable exists; it doesn’t verify rejection or that the stored patient stayed unchanged.
+How did you strengthen it? For a meaningful test, use pytest.raises(ValueError), then assert the store still returns the original patient and contains only that patient
+Accepted / modified / rejected test decisions and evidence: commit SHA e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841
 
 ## J Regression Run
 
@@ -162,7 +197,15 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 |---|---|---|---|---|---|---|---|
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 
-Individual test runs and changed-order independence evidence: [commands, results, links]
+Individual test runs and changed-order independence evidence: 
+
+    - python -m pytest tests/test_services.py::test_register_patient_stores_valid_patient()
+    - 1 passed in 0.04s 
+    - commit SHA d0cfa57734b01bb08ddc67ac31d00c93fa914e03
+    - python -m pytest tests/test_services.py::test_register_patient_rejects_duplicate_id 
+    - 1 passed in 0.07s
+    - commit SHA d0cfa57734b01bb08ddc67ac31d00c93fa914e03
+
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
 A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
 Requirement → test → failure/observation → diagnosis → change → verification: [concise links where applicable]
@@ -180,7 +223,10 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 
 | Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
 |---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| FR-01 Register patient   | stage07/FR-01 | [complete] | [complete] | [complete] | [complete] |
+| [complete]  | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete]   | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete]  | [complete] | [complete] | [complete] | [complete] | [complete] |
 
 ## M Contribution Evidence
 
@@ -188,18 +234,22 @@ Record actual work in test design, implementation, review, traceability, diagnos
 
 | Member | Actual contribution | Evidence link |
 |---|---|---|
+| Sophie Jiang | setup stage07 start point | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/13 |
+| Sophie Jiang | Complete FR-01 Register patient includes test cases | [complete] |
+| [complete] | [complete] | [complete] |
+| [complete] | [complete] | [complete] |
 | [complete] | [complete] | [complete] |
 
 ## N Formative Questions
 
 1. What question does verification answer? (Sophie)
-[response]
+“Are we building the product right?” It checks whether the software conforms to its specified requirements and design, using methods such as reviews and tests.
 
 2. What question does validation answer? (sophie)
-[response]
+“Are we building the right product?” It checks whether the software meets users’ needs and intended use in its real context.
 
 3. What is a unit test? (sophie)
-[response]
+A unit test checks one small, isolated part of the software, such as a function, method, or class, against its expected behaviour using controlled inputs and assertions.
 
 4. What is a pytest fixture?
 A pytest fixture is a function marked with @pytest.fixture that prepares setup, such as a fresh SmartCareDataStore. pytest calls it and passes its return value to any test that names the fixture as a parameter. With the default function scope, each test receives a new object, so tests do not share state.
