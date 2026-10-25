@@ -16,8 +16,8 @@ For each requirement, propose one positive test, one negative test and the key a
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|---------------|--------------|--------|
 | FR-01 Register patient              | Register a valid patient and assert the returned patient is the exact object stored, with its ID and name preserved. | Register a second patient with the same ID and expect ValueError. | Confirm the original remains stored and is the store’s only patient. | Sophie |
 | FR-05 Prevent practitioner conflict | Book A1 for practitioner D1 at 2026-10-01 09:00, then book A2 for a different practitioner (D2) at the same time; A2 is stored as SCHEDULED. | With A1 SCHEDULED for D1 at 09:00, book A2 for D1 at exactly 09:00 with a different patient; the booking is rejected with ValueError.    | pytest.raises(ValueError) around the second D1 booking, then data_store.list_appointments() == [first] and first.status is AppointmentStatus.SCHEDULED. Positive case: second.practitioner is the registered D2 and second.status is AppointmentStatus.SCHEDULED    | Hassan |
-| FR-06 Cancel appointment            | [response]                                                                                                                                   | [response]    | [response]   | Devam  |
-| FR-07 Retain cancelled history      | [response]                                                                                                                                   | [response]    | [response]   | Trung  |
+| FR-06 Cancel appointment            | [response]                                                                                                                               | [response]    | [response]   | Devam  |
+| FR-07 Retain cancelled history      | Create a scheduled appointment, cancel it, and confirm it remains stored in the shared data store with the same object identity; e.g. appointment = appointment_service.book_appointment("A1", "P1", "D1", datetime(...)); cancelled = appointment_service.cancel_appointment("A1", store, "Patient request"). | Attempt to cancel the same appointment again, or cancel a completed appointment; expect ValueError and no state change; e.g. with pytest.raises(ValueError): appointment_service.cancel_appointment("A1", store, "Second cancellation")       | assert data_store.find_appointment("A1") is cancelled and assert cancelled.status is AppointmentStatus.CANCELLED; for illegal transitions, with pytest.raises(ValueError): ...   | Trung  |
 
 ### Activity 2 Strong or weak assertion
 
@@ -43,7 +43,8 @@ Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
 
 (Trung)
 `assert data_store.find_appointment('A1') is appointment`
-Judgement: [Strong for stated behaviour / Weak/unclear]  Why: [response]
+- Judgement: Strong for stated behaviour  
+- Why: This is strong because it checks the real observable requirement that the same appointment object remains stored in the shared SmartCareDataStore after the operation: the same appointment object remains stored after cancellation, rather than being replaced by a new object or lost. It verifies identity preservation, which is the actual business behaviour required by FR-07. The limit is that it only proves the object identity and retention in the store; it does not by itself prove the cancellation reason or timestamp were recorded unless those are also asserted separately.
 
 ### Activity 3 Boundary thinking
 
@@ -62,8 +63,19 @@ same-time practitioner bookings,
 cancelled appointments
 
 (Trung)
-invalid status transitions
-[response]
+invalid status transitions:
+- Input/state: attempt to cancel an appointment that is already CANCELLED
+- Expected result: raise ValueError
+- Supporting contract: only a SCHEDULED appointment may be cancelled; illegal transitions must be rejected and the state must remain unchanged
+- Why this is a boundary case: it tests the limit of the cancellation rule at the edge of the valid state machine, ensuring the contract is enforced rather than silently accepting repeated cancellation
+- Input/state: attempt to cancel an appointment that is COMPLETED
+- Expected result: raise ValueError
+- Supporting contract: Appointment.cancel() must reject any status other than SCHEDULED, leaving the appointment unchanged
+- Why this is a boundary case: it checks that terminal states are protected and cannot be reversed through cancellation
+- Input/state: attempt to cancel a new appointment that has never been booked or has invalid status
+- Expected result: raise ValueError or reject the operation if the object is not in the valid state
+- Supporting contract: the state machine only allows SCHEDULED -> CANCELLED; invalid transitions are not accepted 
+- Why this is a boundary case: it confirms that the domain contract is enforced throughout the lifecycle and not just at the common happy path
 
 ### Activity 4 Critique GitHub Copilot tests
 
@@ -75,7 +87,7 @@ GitHub Copilot generates five tests, all of which pass. Two only assert that obj
 | 2 Weak test: appointment = service.book_appointment("A1", "P1", "D1", valid_time); assert appointment is not None | It doesn’t check the appointment’s identity, participants, time, status, or whether it was stored. | Book the appointment and verify it is stored as A1 with the registered patient and practitioner, requested time, and SCHEDULED status. | Sophie |
 | 3         | assert True passes on every run, even if the operation before it did nothing or did the wrong thing. It only shows that execution reached the last line; it checks no observable result and traces to no criterion.    | With A1 SCHEDULED for D1 at 09:00, attempt to book A2 for D1 at the same time; expect ValueError, then check that A2 was not stored and A1 is still SCHEDULED (FR-05, AC-04.1).               | Hassan True |
 | 4         | [response]   | [response]               | Devam SMS   |
-| 5         | [response]   | [response]               | Trung SMS   |
+| 5         | This candidate is wrong because it assumes an SMS notification mechanism exists and tests a requirement that is not part of the SmartCare contract. It is unrelated to FR-07, which only requires that a cancelled appointment is retained in the store and remains retrievable. It does not check actual observable behaviour of the domain or service contract.   | Verify that a cancelled appointment remains in the shared store and is the same object as before cancellation. Example: appointment = appointment_service.book_appointment("A1", "P1", "D1", datetime(...)); cancelled = appointment_service.cancel_appointment("A1", store, "Patient request"); assert data_store.find_appointment("A1") is cancelled; assert cancelled.status is AppointmentStatus.CANCELLED               | Trung SMS   |
 
 ### Tutorial exit question
 
