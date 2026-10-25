@@ -133,8 +133,8 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 
 | Test ID | Behaviour | Requirement / criterion | Test file/function | Result |
 |---|---|---|---|---|
-| T-FR01-1 | Positive | AC-01.1 - Valid required patient data with an unused ID is stored.| test_register_patient_stores_valid_patient() | [complete] |
-| T-FR01-2 | Negative | AC-01.2 - Registration with an existing patient ID is rejected. | test_register_patient_rejects_duplicate_id() | [complete] |
+| T-FR01-1 | Positive | AC-01.1 - Valid required patient data with an unused ID is stored.| test_register_patient_stores_valid_patient() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
+| T-FR01-2 | Negative | AC-01.2 - Registration with an existing patient ID is rejected. | test_register_patient_rejects_duplicate_id() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
 
 ## G Negative and Boundary Cases
 
@@ -154,27 +154,40 @@ Requirement: FR-01 Register patient
 Acceptance criterion: AC-01.2 - Registration with an existing patient ID is rejected.
 Behaviour to test: Negative
 Human-first test idea/categories: Register patient P1 with Name 'Sophie', then register patient P1 again with name 'David', should return error, and P1 remain as 'Sophie'
-Prompt and purpose: [complete or link]
+Prompt and purpose: Avoid duplicated patient registration
 
 For each significant candidate, copy this entry as needed:
-- Copilot test idea/candidate: [complete]
-- What it claims to verify: [complete]
-- Requirement trace: [complete]
-- Assertion quality: [complete]
-- Human critique: [complete]
-- Decision: [Accept / Modify / Reject]
-- Reason: [complete]
-- Final test reference if accepted/modified: [link or not retained]
-- Actual verification result: [complete; do not claim an unrun test passed]
+- Copilot test idea/candidate: How to avoid duplicated patient registration, what to verify and what requirement trace, how to assertion quality?
+- What it claims to verify: The duplicate attempt raises ValueError, and the original patient remains the exact stored object, unchanged, with no extra patient added.
+- Requirement trace: FR-01, AC-01.2  registration with an existing patient ID is rejected. Use test ID T-FR01-2.
+- Assertion quality: Strong for this criterion—the exception assertion verifies rejection, while the identity and list assertions verify no overwrite or duplicate insertion. Checking only that an object is not None would not prove these behaviours.
+- Human critique: match the requirement, test result is expected
+- Decision: Accept
+- Reason: strong statement and clear steps
+- Final test reference if accepted/modified: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841
+- Actual verification result: complete
 
 Before accepting: traces to a requirement/criterion; can fail for the right reason; assertion checks required behaviour; no invented business rule; no unnecessary private implementation dependence. Reject/modify weak assertions, invented requirements, excessive mocking, duplicates, wrong exceptions, obsolete architecture and unnecessary dependencies.
 
 ## I Weak Copilot Test Reflection
 (Sophie)
-Which Copilot-generated test looked convincing but was weak? [response]
-Why was it weak? [response]
-How did you strengthen it? [response]
-Accepted / modified / rejected test decisions and evidence: [link actual decisions in H]
+Which Copilot-generated test looked convincing but was weak? 
+```
+def test_duplicate_patient_registration_weak() -> None:
+    store = SmartCareDataStore()
+    service = PatientService(store)
+    original = service.register_patient("P1", "Sophie")
+
+    try:
+        service.register_patient("P1", "David")
+    except ValueError:
+        pass
+
+    assert original is not None
+```
+Why was it weak? It passes whether the duplicate registration is correctly rejected or incorrectly accepted. The assertion only checks that the original variable exists; it doesn’t verify rejection or that the stored patient stayed unchanged.
+How did you strengthen it? For a meaningful test, use pytest.raises(ValueError), then assert the store still returns the original patient and contains only that patient
+Accepted / modified / rejected test decisions and evidence: commit SHA e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841
 
 ## J Regression Run
 
@@ -184,7 +197,13 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 |---|---|---|---|---|---|---|---|
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 
-Individual test runs and changed-order independence evidence: [commands, results, links]
+Individual test runs and changed-order independence evidence: 
+
+    - python -m pytest tests/test_services.py::test_register_patient_stores_valid_patient()
+    - 1 passed in 0.04s 
+    - python -m pytest tests/test_services.py::test_register_patient_rejects_duplicate_id 
+    - 1 passed in 0.07s
+
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
 A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
 Requirement → test → failure/observation → diagnosis → change → verification: [concise links where applicable]
