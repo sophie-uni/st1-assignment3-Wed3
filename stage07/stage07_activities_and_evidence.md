@@ -201,8 +201,10 @@ Individual test runs and changed-order independence evidence:
 
     - python -m pytest tests/test_services.py::test_register_patient_stores_valid_patient()
     - 1 passed in 0.04s 
+    - commit SHA d0cfa57734b01bb08ddc67ac31d00c93fa914e03
     - python -m pytest tests/test_services.py::test_register_patient_rejects_duplicate_id 
     - 1 passed in 0.07s
+    - commit SHA d0cfa57734b01bb08ddc67ac31d00c93fa914e03
 
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
 A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
@@ -221,7 +223,10 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 
 | Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
 |---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| FR-01 Register patient   | stage07/FR-01 | [complete] | [complete] | [complete] | [complete] |
+| [complete]  | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete]   | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [complete]  | [complete] | [complete] | [complete] | [complete] | [complete] |
 
 ## M Contribution Evidence
 
@@ -229,18 +234,22 @@ Record actual work in test design, implementation, review, traceability, diagnos
 
 | Member | Actual contribution | Evidence link |
 |---|---|---|
+| Sophie Jiang | setup stage07 start point | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/13 |
+| Sophie Jiang | Complete FR-01 Register patient includes test cases | [complete] |
+| [complete] | [complete] | [complete] |
+| [complete] | [complete] | [complete] |
 | [complete] | [complete] | [complete] |
 
 ## N Formative Questions
 
 1. What question does verification answer? (Sophie)
-[response]
+“Are we building the product right?” It checks whether the software conforms to its specified requirements and design, using methods such as reviews and tests.
 
 2. What question does validation answer? (sophie)
-[response]
+“Are we building the right product?” It checks whether the software meets users’ needs and intended use in its real context.
 
 3. What is a unit test? (sophie)
-[response]
+A unit test checks one small, isolated part of the software, such as a function, method, or class, against its expected behaviour using controlled inputs and assertions.
 
 4. What is a pytest fixture?
 A pytest fixture is a function marked with @pytest.fixture that prepares setup, such as a fresh SmartCareDataStore. pytest calls it and passes its return value to any test that names the fixture as a parameter. With the default function scope, each test receives a new object, so tests do not share state.
