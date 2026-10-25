@@ -104,7 +104,8 @@ Assign TEST IDs before implementation or generation. Use canonical AC IDs with t
 | FR-01 Register patient | AC-01.2 — Registration with an existing patient ID is rejected. | T-FR01-2 | Negative service test | project/tests/test_services.py::test_register_patient_rejects_duplicate_id | Register a patient, then attempt another with the same ID; expect ValueError and verify the original remains stored unchanged. | Planned; not written or run. | Student-authored | Sophie |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Hassan |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Devam |
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | Trung |
+| FR-07 | 	AC-05.2 — Cancelled history remains retrievable in the current session | T-FR07-1 | Positive service test | project/tests/test_services.py::test_cancel_changes_status_and_keeps_appointment_in_store | After cancellation, the appointment is still retrievable by ID and remains in the current session history | Pass — appointment remains stored and traceable after cancellation | Student-authored | Trung |
+| FR-07 | 	AC-05.2 — Cancelled history remains retrievable in the current session | T-FR07-2 | Negative service test | project/tests/test_services.py::test_repeated_cancellation_is_rejected_and_state_remains_cancelled | A cancelled appointment stays present and its state remains CANCELLED; a second cancel attempt is rejected without mutation | Pass — cancelled record remains accessible and state is stable | Student-authored | Trung |
 
 ## C Test Design
 
@@ -116,7 +117,10 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 | T-FR01-2 | FR-01 Register patient | AC-01.2 - Registration with an existing patient ID is rejected. | Negative | test_register_patient_rejects_duplicate_id: register P1, then attempt another registration with the same ID and expect ValueError. | The original remains the exact object found under P1; its name is unchanged; the store still contains only the original. | Adds direct evidence that duplicate registration is rejected without overwriting or adding a patient. |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| T-FR07-1 | FR-07 | Cancellation changes status. | Positive | test_cancel_changes_status: create a valid appointment, call cancel(), and confirm the state transition to CANCELLED. | status changes from SCHEDULED to CANCELLED and the appointment remains traceable. | Confirms the state transition is performed by the domain operation itself, not only by a service wrapper. | 
+| T-FR07-2 | FR-07 | Repeated cancellation is rejected. | Negative | test_repeated_cancellation_is_rejected: create a valid appointment, cancel it once, then call cancel() a second time and expect rejection. | A second cancel raises ValueError and the appointment remains CANCELLED without state mutation. | Guards the domain against illegal repeated transitions and proves the cancellation rule is enforced. |
+| T-FR07-3 | FR-07 | Blank patient ID is rejected. | Negative / Boundary | test_blank_patient_id_is_rejected: create a Patient with empty or whitespace-only patient_id and expect validation to reject it. | ValueError is raised and no invalid Patient object is accepted. | Confirms the required-field rule for identity is enforced before any patient record can exist. |
+| T-FR07-4 | FR-07 | A new appointment starts SCHEDULED. | Positive | test_appointment_starts_scheduled: create a valid Patient and Practitioner, then construct an Appointment and verify the initial status. | Appointment is created successfully and appointment.status is AppointmentStatus.SCHEDULED. | Verifies the initial lifecycle state of a new appointment instead of assuming a default value. |
 
 ## D Arrange Act Assert Record
 
