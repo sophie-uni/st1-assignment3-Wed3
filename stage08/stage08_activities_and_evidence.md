@@ -4,9 +4,9 @@ UG and PG | One evolving group project | Complete this blank record using the St
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
-Group/tutorial: [complete]
-Members and UG/PG cohorts: [complete]
-Record owner / contribution links for each member: [complete]
+Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
+Members and UG/PG cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Heiu
+Record owner / contribution links for each member: https://github.com/sophie-uni/st1-assignment3-Wed3/pulls?q=is%3Apr+state%3Aclosed
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -56,8 +56,8 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## B. Stage 7 baseline and safe preparation
 
-- Stage 7 code SHA and requirement baseline: [complete]
-- Baseline test command / working directory / observed result / evidence: [complete]
+- Stage 7 code SHA and requirement baseline: 420f5be33953c23d2b6bedb532406c4315775c4d; SmartCare A3 Requirements Baseline 2026, revision 2.
+- Baseline test command / working directory / observed result / evidence: python -m pytest / project/ / 30 passed in 0.17s
 - Clean preparation SHA if a record-only commit followed Stage 7: [complete]
 - Branch and preparer / how teammates obtained this branch: [complete]
 - Downloaded tool version, source SHA256 and --check outcome: [complete]
@@ -163,50 +163,50 @@ Each member's substantive contribution and artefact: [complete]
 
 ## K. Ten formative questions
 
-1. What should an engineer do before changing code in response to a failure?
+1. What should an engineer do before changing code in response to a failure? (Sophie)
 
 Response: [complete]
 
-2. Where should expected behaviour come from during debugging?
+2. Where should expected behaviour come from during debugging? (Sophie)
 
 Response: [complete]
 
-3. What is a debugging hypothesis?
+3. What is a debugging hypothesis? (Hassan)
 
 Response: [complete]
 
-4. What is a regression test and why is it retained?
+4. What is a regression test and why is it retained? (Hassan)
 
 Response: [complete]
 
-5. What is meant by root cause?
+5. What is meant by root cause? (Devam)
 
 Response: [complete]
 
-6. What is refactoring?
+6. What is refactoring? (Devam)
 
 Response: [complete]
 
-7. What is a swallowed exception?
+7. What is a swallowed exception? (Devam)
 
 Response: [complete]
 
-8. What is a code smell?
+8. What is a code smell? (Trung)
 
 Response: [complete]
 
-9. How should GitHub Copilot-generated debugging diagnoses be treated?
+9. How should GitHub Copilot-generated debugging diagnoses be treated? (Trung)
 
 Response: [complete]
 
-10. What is the Stage 8 engineering rule?
+10. What is the Stage 8 engineering rule? (Trung)
 
 Response: [complete]
 
 ## L. Completion and handover
 
 - [ ] Existing project, earlier tests and stage records preserved.
-- [ ] Passing Stage 7 SHA and safe preparation details recorded.
+- [✔] Passing Stage 7 SHA and safe preparation details recorded.
 - [ ] Both defects reproduced with meaningful failing tests.
 - [ ] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
 - [ ] Supported causes and minimal repairs explained; focused and full regression results recorded.
