@@ -71,7 +71,7 @@ same-time practitioner bookings:
 - Supporting contract: a conflict needs the exact date/time; no duration-overlap rule exists, so one minute either side is the nearest permitted time. This catches an implementation that compares only the hour or treats nearby times as overlapping.
 - Input/state: A1 for D1 at 09:00 has been CANCELLED; book A2 for D1 at 09:00.
 - Expected result: A2 is stored as SCHEDULED; A1 remains stored as CANCELLED.
-- Supporting contract: only an existing SCHEDULED appointment occupies the slot; a cancelled booking does not.
+- Supporting contract: only an existing SCHEDULED appo  branchintment occupies the slot; a cancelled booking does not.
 - Input/state: P1 is booked with D1 at 09:00; book P1 with D2 at 09:00.
 - Expected result: allowed and stored as SCHEDULED.
 - Supporting contract: no patient-conflict rule applies, so the test must not expect a rejection here.
@@ -194,8 +194,10 @@ Arrange test data; act on one meaningful behaviour; assert the required observab
 | T-FR06-4     | Fresh store; register P1 and D1; add a COMPLETED A1 built from those registered objects.                             | with pytest.raises(ValueError): cancel_appointment('A1')                                 | completed.status is COMPLETED; find_appointment('A1') is completed.                                                                                                                  | Proves the service cannot bypass the domain guard for a terminal state and the stored record stays unchanged.                                                                                                     |
 | T-FR06-D1    | Create a SCHEDULED appointment from fresh Patient and Practitioner objects.                                          | appointment.cancel()                                                                     | status is CANCELLED; appointment_id == 'A1'; date_time == 09:00.                                                                                                                     | Proves the domain transition on its own, without the service or store.                                                                                                                                            |
 | T-FR06-D2    | Create a SCHEDULED appointment and cancel() it once.                                                                 | with pytest.raises(ValueError): appointment.cancel()                                     | status is CANCELLED.                                                                                                                                                                 | Proves the repeat is rejected and does not change the status.                                                                                                                                                     |
-| [complete]   | [complete]                                                                                                           | [complete]                                                                               | [complete]                                                                                                                                                                           | [complete]                                                                                                                                                                                                        |
-| [complete]   | [complete]                                                                                                           | [complete]                                                                               | [complete]                                                                                                                                                                           | [complete]                                                                                                                                                                                                        |
+| T-FR07-1 | Create a valid store, register a patient and practitioner, then create a valid appointment. | Call cancel_appointment("A1") on the scheduled appointment. | Assert the same appointment object is returned, the status is CANCELLED, and the appointment is still findable in the store. | This verifies the lifecycle rule: cancellation changes state while preserving the appointment history in the current session. |
+| T-FR07-2 | Create a valid appointment, then cancel it once. | Create a valid appointment, then cancel it once. | Call cancel_appointment("A1") again. | This proves the guard against repeated cancellation is enforced and illegal transitions are rejected. |
+| T-FR07-3 | Create a fresh SmartCareDataStore and PatientService. Instantiate a valid patient with a unique ID and valid name. | Call service.register_patient("P1", "Trung"). | Assert the returned patient is stored under the same ID, and store.find_patient("P1") is patient. | This proves the valid registration path stores the patient under the correct identity and preserves the patient object in the store. |
+| T-FR07-4 | Create a fresh store and register an original patient with ID "P1". | Attempt to register another patient using the same ID, expecting a duplicate to be rejected. | Assert ValueError is raised, the original patient remains unchanged, and store.list_patients() still contains only the original patient. | This proves duplicate-ID rejection is enforced without overwriting or adding a second patient. |                                                                                              | [complete]                                                                               | [complete]                                                                                                                                                                           | [complete]                                                                                                                                                                                                        |
 
 ## E Domain Test Evidence
 
@@ -203,12 +205,12 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 
 | Test ID | Behaviour | Test file/function | Result |
 |---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] |
 | T-FR04-D1 | New appointment starts SCHEDULED and keeps its ID, participants and date/time | project/tests/test_domain.py::test_new_appointment_starts_scheduled | PASS SHA: [paste tested SHA] |
 | T-FR04-D2 | Appointment rejects a time with seconds, microseconds, a timezone, or given as text (4 parametrised cases) | project/tests/test_domain.py::test_appointment_rejects_time_not_local_minute_precision | PASS (4 cases) SHA: [paste tested SHA] |
 | T-FR06-D1 | cancel() changes SCHEDULED to CANCELLED | project/tests/test_domain.py::test_cancel_changes_status | PASS SHA: [paste tested SHA] |
 | T-FR06-D2 | Repeated cancel() is rejected; status stays CANCELLED | project/tests/test_domain.py::test_repeated_cancel_is_rejected | PASS SHA: [paste tested SHA] |
-
+| T-FR07-1 | Cancelled appointments retain their history while transitioning state; the appointment remains stored and the patient/practitioner references remain intact. | test_cancel_changes_status_and_keeps_appointment_in_store | PASS SHA: 9a61f5c72b091264e737b40b997fe19f874a5179  |
+| T-FR07-2 | A second cancellation attempt is rejected and the cancelled state remains unchanged; the appointment keeps its original date/time. | test_repeated_cancellation_is_rejected_and_state_remains_cancelled | PASS SHA: 9a61f5c72b091264e737b40b997fe19f874a5179  |
 
 ## F Service Test Evidence
 
@@ -241,7 +243,8 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Negative            | A1 already CANCELLED; cancel A1 again through the service. | ValueError. Afterward, A1 is still CANCELLED and list_appointments() == [A1]. Risk checked: a repeat that silently succeeds, removes or duplicates the record. | T-FR06-2 |
 | Negative            | A1 SCHEDULED; cancel the valid but unknown ID 'A9'. | LookupError (not ValueError). Afterward, A1 is still SCHEDULED and list_appointments() == [A1]. Risk checked: a wrong exception type or an unknown ID affecting another record. | T-FR06-3 |
 | Negative / Boundary | Stored A1 with status COMPLETED; cancel A1 through the service. | ValueError. Afterward, A1 is still COMPLETED and find_appointment('A1') is A1. Risk checked: the service forcing CANCELLED without using the domain guard. | T-FR06-4 |
-| [complete]          | [complete]             | [complete]      | [complete] |
+| Negative | Register a patient with an empty or whitespace-only ID, e.g. "" or "   "  | ValueError is raised, and the store remains unchanged with no patient added | T-FR07-3 |
+| Negative  | Attempt to cancel an already-cancelled appointment | ValueError is raised, and the appointment remains CANCELLED with no state mutation | T-FR07-2 |
 
 ## H GitHub Copilot Test Design
 
@@ -318,24 +321,24 @@ Optional fixtures/parametrisation used and why, if any: [response or not used]
 
 Use links rather than copying GitHub history. Continue the Stage 6 workflow; no commit/PR count, conflict or individual test quota is imposed.
 
-| Issue/task                          | Branch         | PR         | Reviewer   | Key feedback | Outcome    |
-|-------------------------------------|----------------|------------|------------|--------------|------------|
-| FR-01 Register patient              | stage07/FR-01  | [complete] | [complete] | [complete]   | [complete] |
-| FR-05 Prevent practitioner conflict | stage07/FR-05  | [complete] | [complete] | [complete]   | [complete] |
-| FR-06 Cancel appointment            | stage07/FR-05  | [complete] | [complete] | [complete]   | [complete] |
-| [complete]                          | [complete]     | [complete] | [complete] | [complete]   | [complete] |
+| Issue/task                          | Branch          | PR         | Reviewer   | Key feedback | Outcome    |
+|-------------------------------------|-----------------|------------|------------|--------------|------------|
+| FR-01 Register patient              | stage07/FR-01   | [complete] | [complete] | [complete]   | [complete] |
+| FR-05 Prevent practitioner conflict | stage07/FR-05   | [complete] | [complete] | [complete]   | [complete] |
+| FR-06 Cancel appointment            | stage07/FR-05   | [complete] | [complete] | [complete]   | [complete] |
+| FR-07 Retained cancelled history    | stage07/TrungBC | [complete] | [complete] | [complete]   | [complete] |
 
 ## M Contribution Evidence
 
 Record actual work in test design, implementation, review, traceability, diagnosis, necessary fixes and integration. Do not include confidential peer ratings.
 
-| Member       | Actual contribution                                                                                                                                                                                                                                                              | Evidence link                                              |
-|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| Sophie Jiang | setup stage07 start point                                                                                                                                                                                                                                                        | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/13 |
-| Sophie Jiang | Complete FR-01 Register patient includes test cases                                                                                                                                                                                                                              | [complete]                                                 |
-| Hassan Ahmad | Designed and implemented FR-05 practitioner-conflict service tests (T-FR05-1 to T-FR05-4) and appointment construction domain tests (T-FR04-D1, T-FR04-D2); completed the FR-05 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 5 and 6  | [paste PR link]                                            |
-| Devam        | Designed and implemented FR-06 cancellation service tests (T-FR06-1 to T-FR06-4) and cancellation domain tests (T-FR06-D1, T-FR06-D2); completed the FR-06 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 7 and 8                       | [paste PR link]                                            |
-| [complete]   | [complete]                                                                                                                                                                                                                                                                       | [complete]                                                 |
+| Member       | Actual contribution                                                                                                                                                                                                                                           | Evidence link                                             |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| Sophie Jiang | setup stage07 start point                                                                                                                                                                                                                                     | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/13 |
+| Sophie Jiang | Complete FR-01 Register patient includes test cases                                                                                                                                                                                                           | [complete]                                                |
+| Hassan Ahmad | Designed and implemented FR-05 practitioner-conflict service tests (T-FR05-1 to T-FR05-4) and appointment construction domain tests (T-FR04-D1, T-FR04-D2); completed the FR-05 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 5 and 6 | [paste PR link]                                           |
+| Devam        | Designed and implemented FR-06 cancellation service tests (T-FR06-1 to T-FR06-4) and cancellation domain tests (T-FR06-D1, T-FR06-D2); completed the FR-06 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 7 and 8    | [paste PR link]                                           |
+| Trung Hieu   | Completed FR-07 cancellation domain and traceability work: designed and implemented the cancellation state-transition tests, repeated-cancellation rejection, and documented the evidence for cancelled-history retention in the current session.             | [paste PR link]                                           |
 
 ## N Formative Questions
 
@@ -364,10 +367,28 @@ Coverage reports which lines or branches executed during a test run, so it can p
 An assertion is weak when a relevant wrong result could still pass it. Examples are assert True, checking only that a value is not None, checking only that a list is non-empty, checking one field when the claim is about the whole result, or catching any exception with a broad try/except or pytest.raises(Exception). A strong assertion checks the exact observable outcome the requirement promises, such as the specific status, the same stored object, the specific exception and the unchanged state after a rejection.
 
 9. What is the appropriate role of GitHub Copilot as a test assistant? (Trung)
-[response]
+
+Its appropriate role is to:
+- Suggest relevant test ideas based on the requirement or acceptance criterion
+- Help draft test names, structure, and assertions
+- Speed up boilerplate creation for pytest or similar frameworks
+- Support traceability by mapping tests back to requirements
+- Help explain edge cases, negative cases, and boundary conditions
+
+==> Copilot is a helper for producing and improving test design, but the engineer remains responsible for validating the result against the real contract and the actual code behavior.
+
 
 10. What is the Stage 7 engineering rule? (Trung)
-[response]
+
+The Stage 7 engineering rule is essentially:
+- Every test must be traceable to a real requirement or acceptance criterion.
+- Every test must have clear evidence that it checks the intended behavior.
+- You must not write tests that are unlinked, vague, or just “for coverage.”
+- If a canonical acceptance criterion exists, tests must align with that canonical contract.
+- If evidence is supplied by a lecturer, a prompt, or a reference, it must be clearly distinguished from student-authored evidence.
+- The result is not “it looks right,” but “it is explicitly bound to a requirement and validated.”
+
+==> In practical terms, Stage 7 is about engineering discipline: requirements -> tests -> evidence -> verification. This prevents test fabrication, mismatched assertions, and unverifiable “AI-generated” claims.
 
 ## O Stage Completion
 
