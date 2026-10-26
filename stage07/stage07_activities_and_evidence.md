@@ -295,7 +295,7 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 
 | Command | Working directory | Code SHA | Passed | Failed | Failure summary | Product defect / test defect / unresolved | Evidence and interpretation |
 |---|---|---|---|---|---|---|---|
-| python -m pytest  | D:\PycharmProjects\st1-assignment3\project | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| python -m pytest  | D:\PycharmProjects\st1-assignment3\project | 420f5be33953c23d2b6bedb532406c4315775c4d | 30 passed in 0.17s | N/A | N/A | N/A | python -m pytest, run from project/, the terminal says 'platform win32 -- Python 3.13.15, pytest-8.3.5, pluggy-1.7.0, rootdir: D:\PycharmProjects\st1-assignment3\project, collected 30 items, tests\test_domain.py .. [  6%]tests\test_services.py ....................[ 73%]tests\test_starter.py ........[100%] |
 
 Individual test runs and changed-order independence evidence: 
 
