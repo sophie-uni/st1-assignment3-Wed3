@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 
 import pytest
 
+from smartcare.data_store import SmartCareDataStore
 from smartcare.domain import (
     Appointment,
     AppointmentStatus,
