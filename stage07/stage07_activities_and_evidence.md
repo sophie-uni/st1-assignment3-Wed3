@@ -1,6 +1,7 @@
 # Stage 7 Testing and Verification Record
 
-Group/tutorial: [complete]  Members/cohorts: [complete]
+Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)  
+Members/cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Heiu
 Requirements baseline: SmartCare A3 Requirements Baseline 2026, revision 2.
 Use the same project/. Link actual evidence; keep responses concise. Blank fields are for your group. Copy rows only as needed.
 
@@ -205,10 +206,10 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 
 | Test ID | Behaviour | Test file/function | Result |
 |---|---|---|---|
-| T-FR04-D1 | New appointment starts SCHEDULED and keeps its ID, participants and date/time | project/tests/test_domain.py::test_new_appointment_starts_scheduled | PASS SHA: [paste tested SHA] |
-| T-FR04-D2 | Appointment rejects a time with seconds, microseconds, a timezone, or given as text (4 parametrised cases) | project/tests/test_domain.py::test_appointment_rejects_time_not_local_minute_precision | PASS (4 cases) SHA: [paste tested SHA] |
-| T-FR06-D1 | cancel() changes SCHEDULED to CANCELLED | project/tests/test_domain.py::test_cancel_changes_status | PASS SHA: [paste tested SHA] |
-| T-FR06-D2 | Repeated cancel() is rejected; status stays CANCELLED | project/tests/test_domain.py::test_repeated_cancel_is_rejected | PASS SHA: [paste tested SHA] |
+| T-FR04-D1 | New appointment starts SCHEDULED and keeps its ID, participants and date/time | project/tests/test_domain.py::test_new_appointment_starts_scheduled | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR04-D2 | Appointment rejects a time with seconds, microseconds, a timezone, or given as text (4 parametrised cases) | project/tests/test_domain.py::test_appointment_rejects_time_not_local_minute_precision | PASS (4 cases) SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-D1 | cancel() changes SCHEDULED to CANCELLED | project/tests/test_domain.py::test_cancel_changes_status | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-D2 | Repeated cancel() is rejected; status stays CANCELLED | project/tests/test_domain.py::test_repeated_cancel_is_rejected | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
 | T-FR07-1 | Cancelled appointments retain their history while transitioning state; the appointment remains stored and the patient/practitioner references remain intact. | test_cancel_changes_status_and_keeps_appointment_in_store | PASS SHA: 9a61f5c72b091264e737b40b997fe19f874a5179  |
 | T-FR07-2 | A second cancellation attempt is rejected and the cancelled state remains unchanged; the appointment keeps its original date/time. | test_repeated_cancellation_is_rejected_and_state_remains_cancelled | PASS SHA: 9a61f5c72b091264e737b40b997fe19f874a5179  |
 
@@ -220,14 +221,14 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 |----------|---------------------|---|---|---|
 | T-FR01-1 | Positive            | AC-01.1 - Valid required patient data with an unused ID is stored.| test_register_patient_stores_valid_patient() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
 | T-FR01-2 | Negative            | AC-01.2 - Registration with an existing patient ID is rejected. | test_register_patient_rejects_duplicate_id() | PASS SHA: e5fa120fa7d9cdbf2a58f56c9cf71087b43aa841 |
-| T-FR05-1 | Negative            | AC-04.1 - Same practitioner/exact time/SCHEDULED conflicts. | test_same_practitioner_same_time_is_rejected() | PASS SHA: [paste tested SHA] |
-| T-FR05-2 | Positive            | AC-04.2 - Another practitioner at the same time is allowed. | test_different_practitioner_same_time_is_allowed() | PASS SHA: [paste tested SHA] |
-| T-FR05-3 | Boundary            | Supporting contract - conflict needs the exact datetime. | test_same_practitioner_one_minute_apart_is_allowed() | PASS (2 cases) SHA: [paste tested SHA] |
-| T-FR05-4 | Boundary            | Supporting contract - a cancelled booking does not occupy the slot. | test_cancelled_appointment_does_not_block_slot() | PASS SHA: [paste tested SHA] |
-| T-FR06-1 | Positive            | AC-05.1 - Cancelling a SCHEDULED appointment changes it to CANCELLED. | test_cancel_appointment_returns_same_cancelled_object() | PASS SHA: [paste tested SHA] |
-| T-FR06-2 | Negative            | AC-05.3 - Repeated cancellation is rejected. | test_repeated_service_cancellation_is_rejected() | PASS SHA: [paste tested SHA] |
-| T-FR06-3 | Negative            | Supporting contract - unknown IDs raise LookupError. | test_cancel_unknown_appointment_raises_lookup_error() | PASS SHA: [paste tested SHA] |
-| T-FR06-4 | Negative / Boundary | Supporting contract - illegal transition raises ValueError; state unchanged. | test_cancel_completed_appointment_through_service_is_rejected() | PASS SHA: [paste tested SHA] |
+| T-FR05-1 | Negative            | AC-04.1 - Same practitioner/exact time/SCHEDULED conflicts. | test_same_practitioner_same_time_is_rejected() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR05-2 | Positive            | AC-04.2 - Another practitioner at the same time is allowed. | test_different_practitioner_same_time_is_allowed() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR05-3 | Boundary            | Supporting contract - conflict needs the exact datetime. | test_same_practitioner_one_minute_apart_is_allowed() | PASS (2 cases) SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR05-4 | Boundary            | Supporting contract - a cancelled booking does not occupy the slot. | test_cancelled_appointment_does_not_block_slot() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-1 | Positive            | AC-05.1 - Cancelling a SCHEDULED appointment changes it to CANCELLED. | test_cancel_appointment_returns_same_cancelled_object() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-2 | Negative            | AC-05.3 - Repeated cancellation is rejected. | test_repeated_service_cancellation_is_rejected() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-3 | Negative            | Supporting contract - unknown IDs raise LookupError. | test_cancel_unknown_appointment_raises_lookup_error() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
+| T-FR06-4 | Negative / Boundary | Supporting contract - illegal transition raises ValueError; state unchanged. | test_cancel_completed_appointment_through_service_is_rejected() | PASS SHA: 1818e3019a360af0927fbdea527c4df42dc41efb |
 
 ## G Negative and Boundary Cases
 
@@ -305,6 +306,12 @@ Individual test runs and changed-order independence evidence:
     - python -m pytest tests/test_services.py::test_register_patient_rejects_duplicate_id 
     - 1 passed in 0.07s
     - commit SHA d0cfa57734b01bb08ddc67ac31d00c93fa914e03
+    - python -m pytest tests/test_domain.py 
+    - 2 passed in 0.09s
+    - commit SHA 1818e3019a360af0927fbdea527c4df42dc41efb
+    - python -m pytest tests/test_services.py 
+    - 20 passed in 0.06s
+    - commit SHA 1818e3019a360af0927fbdea527c4df42dc41efb
 
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
 A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
@@ -312,10 +319,15 @@ Requirement → test → failure/observation → diagnosis → change → verifi
 
 ## K What the Suite Still Does Not Prove
 
-What does your test suite still not prove? [response]
-Coverage if used: [result or not used]
-Which uncovered areas matter, and why does coverage percentage alone not establish correctness? [response]
-Optional fixtures/parametrisation used and why, if any: [response or not used]
+What does your test suite still not prove? 
+
+The suite tests selected behaviours such as patient registration, appointment booking and cancellation, but it does not prove the system is defect-free or that every requirement and input case works. It also does not establish behaviour under concurrent use, performance, persistence across restarts, or real-world use unless those are tested separately. Coverage percentage shows which code ran; it does not prove assertions are correct or strong, that all important cases were tested, or that missing requirements were implemented.
+
+Coverage if used: Not measured.
+
+Which uncovered areas matter, and why does coverage percentage alone not establish correctness? N/A
+
+Optional fixtures/parametrisation used and why, if any: Not used.
 
 ## L Git and Review Evidence
 
@@ -323,10 +335,10 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 
 | Issue/task                          | Branch          | PR         | Reviewer   | Key feedback | Outcome    |
 |-------------------------------------|-----------------|------------|------------|--------------|------------|
-| FR-01 Register patient              | stage07/FR-01   | [complete] | [complete] | [complete]   | [complete] |
-| FR-05 Prevent practitioner conflict | stage07/FR-05   | [complete] | [complete] | [complete]   | [complete] |
-| FR-06 Cancel appointment            | stage07/FR-05   | [complete] | [complete] | [complete]   | [complete] |
-| FR-07 Retained cancelled history    | stage07/TrungBC | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/17 | [complete] | [complete]   | [complete] |
+| FR-01 Register patient              | stage07/FR-01   | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/15 | Sophie | Code reviewed | Merged to main |
+| FR-05 Prevent practitioner conflict | stage07/FR-05   | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/18/ | Trung | Code reviewed | Merged to main |
+| FR-06 Cancel appointment            | stage07/FR-05   | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/18/ | Trung | Code reviewed | Merged to main |
+| FR-07 Retained cancelled history    | stage07/TrungBC | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/17 | Sophie | Code reviewed | Merged to main |
 
 ## M Contribution Evidence
 
@@ -335,9 +347,9 @@ Record actual work in test design, implementation, review, traceability, diagnos
 | Member       | Actual contribution                                                                                                                                                                                                                                           | Evidence link |
 |--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
 | Sophie Jiang | setup stage07 start point                                                                                                                                                                                                                                     | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/13 |
-| Sophie Jiang | Complete FR-01 Register patient includes test cases                                                                                                                                                                                                           | [complete] |
-| Hassan Ahmad | Designed and implemented FR-05 practitioner-conflict service tests (T-FR05-1 to T-FR05-4) and appointment construction domain tests (T-FR04-D1, T-FR04-D2); completed the FR-05 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 5 and 6 | [paste PR link] |
-| Devam        | Designed and implemented FR-06 cancellation service tests (T-FR06-1 to T-FR06-4) and cancellation domain tests (T-FR06-D1, T-FR06-D2); completed the FR-06 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 7 and 8    | [paste PR link] |
+| Sophie Jiang | Complete FR-01 Register patient includes test cases                                                                                                                                                                                                           | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/15 |
+| Hassan Ahmad | Designed and implemented FR-05 practitioner-conflict service tests (T-FR05-1 to T-FR05-4) and appointment construction domain tests (T-FR04-D1, T-FR04-D2); completed the FR-05 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 5 and 6 | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/14 |
+| Devam        | Designed and implemented FR-06 cancellation service tests (T-FR06-1 to T-FR06-4) and cancellation domain tests (T-FR06-D1, T-FR06-D2); completed the FR-06 traceability, test design, Arrange–Act–Assert and boundary entries; formative questions 7 and 8    | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/18 |
 | Trung Hieu   | Completed FR-07 cancellation domain and traceability work: designed and implemented the cancellation state-transition tests, repeated-cancellation rejection, and documented the evidence for cancelled-history retention in the current session.             | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/19 |
 
 ## N Formative Questions
@@ -392,9 +404,9 @@ The Stage 7 engineering rule is essentially:
 
 ## O Stage Completion
 
-Tested Stage 7 main SHA: [complete]
-Full-suite result: [complete]
-Unresolved defects and effect on baseline: [complete or none]
-Clean working tree and integration evidence: [complete]
-Stage 8 handover status: [complete; no Stage 8 work assigned]
-All tutorial/formative responses and traceability/Copilot decisions complete: [confirm]
+Tested Stage 7 main SHA: 420f5be33953c23d2b6bedb532406c4315775c4d
+Full-suite result: 30 passed in 0.17s
+Unresolved defects and effect on baseline: none
+Clean working tree and integration evidence: https://github.com/sophie-uni/st1-assignment3-Wed3/pulls?q=is%3Apr+state%3Aclosed
+Stage 8 handover status: Ready to process
+All tutorial/formative responses and traceability/Copilot decisions complete: Yes
