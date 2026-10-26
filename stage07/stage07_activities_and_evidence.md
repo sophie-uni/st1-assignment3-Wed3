@@ -295,7 +295,7 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 
 | Command | Working directory | Code SHA | Passed | Failed | Failure summary | Product defect / test defect / unresolved | Evidence and interpretation |
 |---|---|---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| python -m pytest  | D:\PycharmProjects\st1-assignment3\project | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
 
 Individual test runs and changed-order independence evidence: 
 
