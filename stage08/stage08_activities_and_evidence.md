@@ -21,51 +21,92 @@ For each, choose symptom, evidence or hypothesis/opinion, and explain your reaso
 - Traceback points to smartcare/services.py line 42 in the example.
 The example line number is illustrative; inspect the actual line in your run. The removal hypothesis must be tested against the current project, which has no public delete operation.
 
-Response and reason: [complete]
+Response and reason:
+- Appointment disappears after cancellation.(Sophie)
+- The data-store removal path is probably being called. (Trung)
+- The failing test shows store.find_appointment('A1') returns None. (Hassan)
+- The service layer is badly designed. (Devam)
+- Traceback points to smartcare/services.py line 42 in the example. (Sophie)
 
-### A.2 Build a debugging record
+### A.2 Build a debugging record (Sophie)
 Choose the cancelled-history scenario or a same-practitioner/time booking. Before changing code, record expected behaviour, observed behaviour, minimal reproduction, a hypothesis and evidence to inspect. Use a requirement to justify the expectation. Keep the initial hypothesis even if later evidence disproves it.
 
 Response and reason: [complete]
 
-### A.3 Test defect or product defect
+### A.3 Test defect or product defect (Hassan)
 A test expects cancelled appointments to be deleted, but FR-07 says history must be retained. What should be changed? Explain why. Also decide whether a test expecting different practitioners at the same time to conflict reflects AC-04.2. Do not assume every failing test is correct.
 
 Response and reason: [complete]
 
-### A.4 Refactoring smell hunt
+### A.4 Refactoring smell hunt (Devam)
 Consider a hypothetical 70-line AppointmentService method containing duplicate status strings, direct collection manipulation, printing, validation and four nested conditionals. Identify the smells and propose small refactorings that preserve required behaviour. The direct collection work replaces the old storage-specific scenario; use the existing SmartCareDataStore boundary. Do not implement an extra architecture.
 Classify these proposed changes as refactoring, repair or feature: rename appt to appointment; extract a repeated conflict helper; add rescheduling; restore retained cancellation lookup; replace a magic status string with the existing enum. Explain the behaviour that must remain unchanged.
 
 Response and reason: [complete]
 
-### A.5 Traceback and hypothesis ranking
+### A.5 Traceback and hypothesis ranking (Trung)
 Using one actual failure, identify its exception/assertion, expected and observed values, test line, application call path and supporting requirement. List three plausible causes and rank them by fit with the available evidence. For each cause, name a check that could distinguish it from the others. Explain why a traceback alone does not establish the cause.
 
 Response and reason: [complete]
 
-### A.6 Exit question
+### A.6 Exit question (Hassan)
 Why is changing code immediately after seeing a failure often a poor debugging strategy?
 
 Response and reason: [complete]
 
 
-Classification responses (1–5, each with reason): [complete]
-Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: [complete]
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete]
+Classification responses (1–5, each with reason):
+- Appointment disappears after cancellation.(Sophie)
+- The data-store removal path is probably being called. (Trung)
+- The failing test shows store.find_appointment('A1') returns None. (Hassan)
+- The service layer is badly designed. (Devam)
+- Traceback points to smartcare/services.py line 42 in the example. (Sophie)
+Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: [complete] (Sophie)
+Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete] (Trung)
 
 ## B. Stage 7 baseline and safe preparation
 
 - Stage 7 code SHA and requirement baseline: 420f5be33953c23d2b6bedb532406c4315775c4d; SmartCare A3 Requirements Baseline 2026, revision 2.
-- Baseline test command / working directory / observed result / evidence: python -m pytest / project/ / 30 passed in 0.17s
-- Clean preparation SHA if a record-only commit followed Stage 7: [complete]
-- Branch and preparer / how teammates obtained this branch: [complete]
-- Downloaded tool version, source SHA256 and --check outcome: [complete]
-- --apply and --verify output summaries / artefact references: [complete]
-- Bounded diff inspected and recovery location (not committed): [complete]
-- Prepared faulty-state commit SHA: [complete]
-- Preparation or recovery issues and resolution, if any: [complete]
-- Initial prepared full-suite command / result / key failures: [complete]
+- Baseline test command / working directory / observed result / evidence: 
+  - command: python -m pytest 
+  - working directory: project/
+  - Result: 30 passed in 0.17s
+- Clean preparation SHA if a record-only commit followed Stage 7: 8593ea0f85854f908221aaccdb1e420b89cc39c6
+- Branch and preparer / how teammates obtained this branch: 
+  - branch debug/stage08, tutor prepared branch with new services.py file
+  - obtain branch code: git fetch origin
+- Downloaded tool version, source SHA256 and --check outcome:
+  - Command: python D:\PycharmProjects\prepare_debugging.py project --check
+  - Result: 
+    - Stage 8 tool 1.1; preflight PASS; baseline SHA256 986c5445532ffd1d85e88639b6b6f34b84e15b2bbfc1882511a96938c3b641f6
+    - Baseline Git SHA 6abe564b41b1a6af0e46a069359f9255895fa486
+    - CHECK ONLY: project unchanged; both proposed fault signatures verified in a temporary copy
+- --apply and --verify output summaries / artefact references: 
+  - --apply command:python D:\PycharmProjects\prepare_debugging.py project --apply
+  - Result:
+    - Stage 8 tool 1.1; preflight PASS; baseline SHA256 986c5445532ffd1d85e88639b6b6f34b84e15b2bbfc1882511a96938c3b641f6 
+    - Baseline Git SHA 6abe564b41b1a6af0e46a069359f9255895fa486 
+    - PREPARED: F8-01 practitioner conflict; F8-02 retained-history lookup 
+    - Verified expected failures: test_f8_01_conflict; test_f8_02_history (2 failed)
+    - Backup/hash recorded in .stage8_faults; use --restore for setup recovery only
+  - --verify command: python D:\PycharmProjects\prepare_debugging.py project --verify
+  - Result:
+    - VERIFIED: exactly 2 expected failures; both approved symptom signatures present
+- Bounded diff inspected and recovery location (not committed):
+  - Command: git diff --stat
+  - Result: 
+    - smartcare/data_store.py | 29 ++++++++++++++++++++++++------ 
+    - 1 file changed, 11 insertions(+), 18 deletions(-)
+  - Also inspected there is .stage8_faults folder created locally with data_store.before.py file
+- Prepared faulty-state commit SHA: b5a8a53ba218b6ec12307606b5031d948e5577e6
+- Preparation or recovery issues and resolution, if any:
+  - 8 issues created (issue 24 to issue 31)
+  - https://github.com/sophie-uni/st1-assignment3-Wed3/issues
+- Initial prepared full-suite command / result / key failures:
+  - Command: git commit -m "Stage 08 tutor preparation"
+  - Result:
+    - [debug/stage08 b5a8a53] Stage 08 tutor preparation 
+    - 1 file changed, 11 insertions(+), 18 deletions(-)
 
 ## C. F8-01 diagnosis and repair
 
@@ -134,7 +175,7 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
 Unrelated failures investigated / resolution: [complete or not applicable with reason]
 
-## H. Refactoring decision and before/after verification
+## H. Refactoring decision and before/after verification (Sophie)
 
 Smell and exact location: [complete]
 Small proposed structural change / why justified: [complete before editing]
@@ -146,7 +187,17 @@ Result — accepted, revised or rejected / reason / behaviour-preservation concl
 
 ## I. Git, human review and integration
 
-Issues for both defects / refactor scope and owners: [complete]
+Issues for both defects / refactor scope and owners: 
+  - F8-01: 
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/27 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/28 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/31 ()
+  - F8-02:
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 ()
 Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
 PR link and another member's reviewer identity: [complete]
 Key human feedback, difference from Copilot findings and response/outcome: [complete]
