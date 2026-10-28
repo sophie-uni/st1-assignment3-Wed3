@@ -332,3 +332,38 @@ def test_cancel_completed_appointment_through_service_is_rejected() -> None:
 
     assert completed.status is AppointmentStatus.COMPLETED
     assert data_store.find_appointment('A1') is completed
+
+
+    # Stage 8 refactor guard: booking participant lookup behaviour
+
+    def test_book_unknown_practitioner_is_rejected() -> None:
+        """R8-1: an unknown practitioner raises LookupError and nothing is stored."""
+        data_store = SmartCareDataStore()
+        PatientService(data_store).register_patient('P1', 'Alex Example')
+        appointment_service = AppointmentService(data_store)
+
+        with pytest.raises(LookupError):
+            appointment_service.book_appointment(
+                'A1',
+                'P1',
+                'D9',
+                datetime(2026, 10, 1, 9, 0),
+            )
+
+        assert data_store.list_appointments() == []
+
+    def test_book_blank_practitioner_id_is_rejected() -> None:
+        """R8-2: a blank practitioner ID raises ValueError and nothing is stored."""
+        data_store = SmartCareDataStore()
+        PatientService(data_store).register_patient('P1', 'Alex Example')
+        appointment_service = AppointmentService(data_store)
+
+        with pytest.raises(ValueError):
+            appointment_service.book_appointment(
+                'A1',
+                'P1',
+                '   ',
+                datetime(2026, 10, 1, 9, 0),
+            )
+
+        assert data_store.list_appointments() == []

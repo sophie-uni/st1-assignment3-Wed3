@@ -100,12 +100,10 @@ class AppointmentService:
         invalid values, duplicate appointment IDs or a practitioner
         conflict.
         """
-        patient = self.data_store.find_patient(patient_id)
-        practitioner = self.data_store.find_practitioner(practitioner_id)
-        if patient is None:
-            raise LookupError('Patient not found')
-        if practitioner is None:
-            raise LookupError('Practitioner not found')
+        patient, practitioner = self._find_participants(
+            patient_id,
+            practitioner_id,
+        )
         appointment = Appointment(
             appointment_id,
             patient,
@@ -125,6 +123,24 @@ class AppointmentService:
             )
         self.data_store.add_appointment(appointment)
         return appointment
+
+    def _find_participants(
+            self,
+            patient_id: str,
+            practitioner_id: str,
+    ) -> tuple[Patient, Practitioner]:
+        """Return the registered patient and practitioner for booking.
+
+        Raise ValueError for a blank/invalid ID and LookupError for an
+        absent participant. Do not create or change records.
+        """
+        patient = self.data_store.find_patient(patient_id)
+        practitioner = self.data_store.find_practitioner(practitioner_id)
+        if patient is None:
+            raise LookupError('Patient not found')
+        if practitioner is None:
+            raise LookupError('Practitioner not found')
+        return patient, practitioner
 
     def find_appointment(self, appointment_id: str) -> Appointment:
         """Return the stored appointment; raise LookupError when absent.
