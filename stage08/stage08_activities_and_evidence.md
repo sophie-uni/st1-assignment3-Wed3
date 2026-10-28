@@ -4,9 +4,9 @@ UG and PG | One evolving group project | Complete this blank record using the St
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
-Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)  
-Members/cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Heiu
-Record owner / contribution links for each member: [complete]
+Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
+Members and UG/PG cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Heiu
+Record owner / contribution links for each member: https://github.com/sophie-uni/st1-assignment3-Wed3/pulls?q=is%3Apr+state%3Aclosed
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -104,16 +104,16 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## B. Stage 7 baseline and safe preparation
 
-- Stage 7 code SHA and requirement baseline: [Stage 7 main SHA]; SmartCare A3 Requirements Baseline 2026, revision 2.
-- Baseline test command / working directory / observed result / evidence: `python -m pytest -q` / project/ / [e.g. "N passed in …s"] / [link]
-- Clean preparation SHA if a record-only commit followed Stage 7: [SHA, or "not applicable — no record-only commit"]
-- Branch and preparer / how teammates obtained this branch: debug/stage8, prepared by [member]; teammates ran `git fetch` then `git switch debug/stage8` (no one else ran the utility).
-- Downloaded tool version, source SHA256 and --check outcome: prepare_debugging.py version 1.1 / [SHA256 printed by the tool] / [summary of --check output]
-- --apply and --verify output summaries / artefact references: [summaries]
-- Bounded diff inspected and recovery location (not committed): `git diff --stat` showed only project/smartcare/data_store.py changed [confirm]; backup in project/.stage8_faults/ (ignored by .gitignore, not committed).
-- Prepared faulty-state commit SHA: [SHA]
-- Preparation or recovery issues and resolution, if any: [none, or describe]
-- Initial prepared full-suite command / result / key failures: `python -m pytest -q` from project/ / [e.g. "N failed, M passed"] / [list the failing tests, e.g. conflict and cancellation tests in test_services.py and test_starter.py]
+- Stage 7 code SHA and requirement baseline: 420f5be33953c23d2b6bedb532406c4315775c4d; SmartCare A3 Requirements Baseline 2026, revision 2.
+- Baseline test command / working directory / observed result / evidence: python -m pytest / project/ / 30 passed in 0.17s
+- Clean preparation SHA if a record-only commit followed Stage 7: [complete]
+- Branch and preparer / how teammates obtained this branch: [complete]
+- Downloaded tool version, source SHA256 and --check outcome: [complete]
+- --apply and --verify output summaries / artefact references: [complete]
+- Bounded diff inspected and recovery location (not committed): [complete]
+- Prepared faulty-state commit SHA: [complete]
+- Preparation or recovery issues and resolution, if any: [complete]
+- Initial prepared full-suite command / result / key failures: [complete]
 
 ## C. F8-01 diagnosis and repair
 
@@ -300,50 +300,50 @@ Each member's substantive contribution and artefact:
 
 ## K. Ten formative questions
 
-1. What should an engineer do before changing code in response to a failure?
+1. What should an engineer do before changing code in response to a failure? (Sophie)
 
 Response: Read the failure fully, reproduce it with small synthetic input, state the expected behaviour from the requirement, and decide whether the product or the test is wrong. Then form a hypothesis and run a check that confirms or rejects it before making the smallest change.
 
-2. Where should expected behaviour come from during debugging?
+2. Where should expected behaviour come from during debugging? (Sophie)
 
 Response: From the approved requirements and published contracts (the revision 2 baseline, acceptance criteria and the documented method contracts), not from what the current code happens to return, from a failing test's assumption or from a Copilot suggestion.
 
-3. What is a debugging hypothesis?
+3. What is a debugging hypothesis? (Hassan)
 
 Response: A specific, testable explanation of why a failure occurs, together with a check that could prove it wrong. For example, "the lookup hides cancelled appointments" can be tested by comparing list_appointments() with find_appointment().
 
-4. What is a regression test and why is it retained?
+4. What is a regression test and why is it retained? (Hassan)
 
 Response: A test that exposes a defect, fails before the repair and passes after it. It stays in the suite so that if a later change brings the defect back, the suite fails straight away.
 
-5. What is meant by root cause?
+5. What is meant by root cause? (Devam)
 
 Response: The underlying faulty decision that produces the failure, as opposed to where the symptom is seen. Fixing the root cause stops the failure; fixing only the symptom leaves it able to return.
 
-6. What is refactoring?
+6. What is refactoring? (Devam)
 
 Response: Changing the internal structure of code to make it clearer or easier to maintain without changing its external behaviour: the same results, exceptions and state changes. Tests passing before and after is the evidence that behaviour was preserved.
 
-7. What is a swallowed exception?
+7. What is a swallowed exception? (Devam)
 
 Response: An exception that is caught and then ignored or hidden, for example `except Exception: pass`. The program carries on as if nothing went wrong, so the real failure is hidden and becomes harder to diagnose.
 
-8. What is a code smell?
+8. What is a code smell? (Trung)
 
 Response: A sign in the code that its design may cause problems, such as a long method, duplicated code, magic strings, unclear names or misplaced responsibility. A smell is not a bug by itself, but it is a reason to consider a small refactor.
 
-9. How should GitHub Copilot-generated debugging diagnoses be treated?
+9. How should GitHub Copilot-generated debugging diagnoses be treated? (Trung)
 
 Response: As unverified hypotheses. Each suggestion is checked against the requirement and against real evidence from the code and test runs, then accepted, modified or rejected with a reason. Confident wording is not proof, and Copilot does not replace human diagnosis or another member's review.
 
-10. What is the Stage 8 engineering rule?
+10. What is the Stage 8 engineering rule? (Trung)
 
 Response: Diagnose before you fix. Reproduce the failure, record a human hypothesis, gather evidence, make the smallest repair the evidence supports, keep a regression test, and refactor only under passing tests.
 
 ## L. Completion and handover
 
 - [ ] Existing project, earlier tests and stage records preserved.
-- [ ] Passing Stage 7 SHA and safe preparation details recorded.
+- [✔] Passing Stage 7 SHA and safe preparation details recorded.
 - [ ] Both defects reproduced with meaningful failing tests.
 - [ ] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
 - [ ] Supported causes and minimal repairs explained; focused and full regression results recorded.
