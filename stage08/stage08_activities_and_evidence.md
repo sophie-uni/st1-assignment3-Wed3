@@ -23,15 +23,22 @@ The example line number is illustrative; inspect the actual line in your run. Th
 
 Response and reason:
 - Appointment disappears after cancellation.(Sophie)
+  - Response and reason: **Symptom** It describes the observed problem, but doesn’t explain its cause.
 - The data-store removal path is probably being called. (Trung)
 - The failing test shows store.find_appointment('A1') returns None. (Hassan)
 - The service layer is badly designed. (Devam)
 - Traceback points to smartcare/services.py line 42 in the example. (Sophie)
+  - Response and reason: **Evidence** A traceback provides evidence of where an exception surfaced. The traceback location alone doesn’t establish the root cause.
 
 ### A.2 Build a debugging record (Sophie)
 Choose the cancelled-history scenario or a same-practitioner/time booking. Before changing code, record expected behaviour, observed behaviour, minimal reproduction, a hypothesis and evidence to inspect. Use a requirement to justify the expectation. Keep the initial hypothesis even if later evidence disproves it.
 
-Response and reason: [complete]
+Response and reason: cancelled-history
+- **Expected:** Under FR-07 / AC-05.2, cancelling an appointment changes its status to `CANCELLED` and retains it in appointment history.
+- **Observed:** The test case `test_cancel_changes_status_and_keeps_appointment_in_store` in test_domain.py has line 45 `data_store.find_appointment("A-001")` has returned `None`, not the original appointment. That shows lookup failed to return it; it does not alone prove deletion.
+- **Minimal reproduction:** Use a fresh data store, add a patient, practitioner, and appointment `Rep A`; cancel it; assert its status and that lookup returns the same object. 
+- **Initial hypothesis:** Lookup may filter out cancelled appointments even though they remain stored. 
+- **Evidence to inspect:** AssertionError: assert None is <smartcare.domain.Appointment object at 0x000001B70EE0E3C0>, where None = find_appointment('A-001'), at tests\test_domain.py:45: AssertionError, it points out that checking the function data_store.find_appointment()
 
 ### A.3 Test defect or product defect (Hassan)
 A test expects cancelled appointments to be deleted, but FR-07 says history must be retained. What should be changed? Explain why. Also decide whether a test expecting different practitioners at the same time to conflict reflects AC-04.2. Do not assume every failing test is correct.
@@ -53,16 +60,6 @@ Response and reason: [complete]
 Why is changing code immediately after seeing a failure often a poor debugging strategy?
 
 Response and reason: [complete]
-
-
-Classification responses (1–5, each with reason):
-- Appointment disappears after cancellation.(Sophie)
-- The data-store removal path is probably being called. (Trung)
-- The failing test shows store.find_appointment('A1') returns None. (Hassan)
-- The service layer is badly designed. (Devam)
-- Traceback points to smartcare/services.py line 42 in the example. (Sophie)
-Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: [complete] (Sophie)
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete] (Trung)
 
 ## B. Stage 7 baseline and safe preparation
 
@@ -95,7 +92,7 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Bounded diff inspected and recovery location (not committed):
   - Command: git diff --stat
   - Result: 
-    - smartcare/data_store.py | 29 ++++++++++++++++++++++++------ 
+    - smartcare/data_store.py | 29 +++++++++++++++----------- 
     - 1 file changed, 11 insertions(+), 18 deletions(-)
   - Also inspected there is .stage8_faults folder created locally with data_store.before.py file
 - Prepared faulty-state commit SHA: b5a8a53ba218b6ec12307606b5031d948e5577e6
