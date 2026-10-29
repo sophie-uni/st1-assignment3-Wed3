@@ -116,8 +116,22 @@ Response and reason: [complete]
   - tests\test_starter.py:127: Failed
 - Human hypothesis and intended checks: see E, F8-01.
 - Supported root cause and inspected code/runtime evidence: The inspected conflict predicate in project/smartcare/data_store.py compares practitioner IDs using != (around line 110). That means an existing D1 appointment is not considered a conflict for a new D1 booking, while a different practitioner at that time may incorrectly be considered one. AppointmentService.book_appointment calls this predicate before storing the new appointment. This code evidence matches the reported failure; targeted tests should confirm it after repair.
-- Smallest justified fix / diff / why other behaviour is preserved: Change only the practitioner comparison from != practitioner_id to == practitioner_id, retaining the existing appointment-ID exclusion, time equality, and scheduled-status checks. This should reject a same-practitioner conflict while preserving the allowed same-time booking for a different practitioner. Verify both cases with tests after the change.
-- Repair SHA / focused verification result: [complete]
+- Smallest justified fix / diff / why other behaviour is preserved: Change only the practitioner comparison from != practitioner_id to == practitioner_id, in data_store.py line 110.
+- Repair SHA / focused verification result: 6f0f25df9e82401abaeb71b4c938c2513684f78f tests\test_regressions.py . 1 passed in 0.07stests\test_regressions.py . 1 passed in 0.07s
+
+(Issue 25)
+- Symptom / observed behaviour: Cancel an appointment, then try to find the appointment in the system, return none
+- Expected behaviour and requirement: return appointment details with status as cancelled
+- Minimal synthetic reproduction steps: From project/, run "python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment"
+- Meaningful failing test path/name and exact relevant failure: FAILED tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment - AssertionError: assert None is <smartcare.domain.Appointment object at 0x000001C397D6D2B0>
+  - E       AssertionError: assert None is <smartcare.domain.Appointment object at 0x000001C397D6D2B0>
+  - E        +  where None = find_appointment('A1')
+  - E        +    where find_appointment = <smartcare.data_store.SmartCareDataStore object at 0x000001C397D6C830>.find_appointment
+  - tests\test_services.py:71: AssertionError
+- Human hypothesis and intended checks: see E, F8-01.
+- Supported root cause and inspected code/runtime evidence: find_appointment() keeps blank-ID validation and makes cancelled appointments retrievable. Leave the conflict check’s `SCHEDULED` filter in place, so cancelled history is retained without blocking the slot.
+- Smallest justified fix / diff / why other behaviour is preserved: in project/smartcare/data_store.py, find_appointment() is filtering cancelled records out, change to don't filter.
+- Repair SHA / focused verification result: af558dc247252b1f7b00535d7b481c3083378acc tests\test_regressions.py . 1 passed in 0.07s
 
 - Symptom / observed behaviour: [complete]
 - Expected behaviour and requirement: [complete]
@@ -147,7 +161,12 @@ Complete both entries BEFORE Copilot. C/D supply observed/expected/reproduction/
 (Issue 31)
 Likely cause and why plausible: My initial hypothesis is that the practitioner ID comparison in the conflict check may be incorrect. This is plausible because the reported tests show a same-practitioner, same-time booking was accepted, while a different-practitioner booking at that time was rejected. 
 Evidence intended to inspect / competing explanation / discriminating check: I will inspect the failing assertion, the stored appointment’s practitioner ID, time and status, and the book_appointment → conflict-check path. A competing explanation is that the test setup passes a different practitioner ID or datetime than intended. I will verify the actual values and compare the conflict-check result for D1 and D2 using the same store.
-Member and saved sequence/time or commit showing this preceded consultation: Sophie, Commit:
+Member and saved sequence/time or commit showing this preceded consultation: Sophie, Commit: 2e03f3d06dfde3523c8c8baeaedf127e326b8f38
+
+(Issue 25)
+Likely cause and why plausible: cancel appointment doesn't change appointment status to cancelled, instead, delete the appointment from data store.
+Evidence intended to inspect / competing explanation / discriminating check: In services.py, function cancel_appointment has appointment.cancel() line 150
+Member and saved sequence/time or commit showing this preceded consultation: Sophie, Commit: 2feb2b711f308a7a756c21470257338c3fdda88c
 
 Likely cause and why plausible: [complete]
 Evidence intended to inspect / competing explanation / discriminating check: [complete]
@@ -163,7 +182,7 @@ Member and saved sequence/time or commit showing this preceded consultation: [co
 Use the full handout prompt separately for BOTH defects, after E. Keep each actual prompt or accessible reference; include observed behaviour, expected behaviour, reproduction, failing test, human hypothesis, relevant code, three ranked causes and discriminating checks, with the no-rewrite/no-invented-requirements constraints.
 
 ### F8-01 Copilot review
-Actual prompt / output reference and member: [complete]
+Actual prompt / output reference and member:
 1. Issue 31 (Sophie) : Actual prompt:fix the test function `test_conflict_rule_and_different_practitioner` and explain 
   - Ranked suggestion: The rejection and list assertions verify the failed booking did not add A2 or alter A1; the final assertions verify the valid D2 booking was stored.
   - evidence check: The test’s expected behavior is correct: AC-04.1 rejects the same practitioner at the same time; AC-04.2 allows a different practitioner at that time. Don’t weaken the assertions to make faulty application code pass. Here’s a clearer version with state checks
@@ -177,7 +196,13 @@ Actual prompt / output reference and member: [complete]
   - correct, partly correct or wrong: Correct, tests\test_regressions.py . 1 passed in 0.07s
   - accept, modify or reject with reason: Accept, the test is pass
 
-2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
+2. Issue 25 (Sophie) : Actual prompt: fix `FAILED tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment - AssertionError: assert None is <smartcare.domain.Appointment object at 0x000001C397D6D2B0>`
+  - Ranked suggestion: To preserve cancellation history under FR-07 / AC-05.2, change find_appointment() to return a matching appointment regardless of status, while keeping its blank-ID validation. Keep the conflict check’s SCHEDULED filter separate so cancelled appointments remain findable but don’t block the time slot.
+  - evidence check: The fix is in project/smartcare/data_store.py, not domain.py. Appointment.cancel() already changes the status without deleting the appointment; find_appointment() is filtering cancelled records out.
+  - observed evidence: project/smartcare/data_store.py line 93-94, run python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment
+  - correct, partly correct or wrong: Correct, tests\test_regressions.py .  1 passed in 0.07s
+  - accept, modify or reject with reason: Accept, the test is pass
+
 3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
 Final human conclusion and comparison with initial hypothesis: [complete]
 
@@ -192,10 +217,10 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner [stage08/issue31](D:\PycharmProjects\st1-assignment3\project>) | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
-| F8-01 after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 before repair | [complete]  | [complete] | [complete] |
-| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
+| F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
+| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F  |
+| F8-01 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
@@ -226,7 +251,7 @@ Issues for both defects / refactor scope and owners:
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/31 (Sophie)
   - F8-02:
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 ()
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 (Sophie)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 ()
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 ()
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 ()
