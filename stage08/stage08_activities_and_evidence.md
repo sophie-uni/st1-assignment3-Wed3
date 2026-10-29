@@ -106,6 +106,18 @@ Response and reason: [complete]
     - 1 file changed, 11 insertions(+), 18 deletions(-)
 
 ## C. F8-01 diagnosis and repair
+(Issue 31)
+- Symptom / observed behaviour: Patient P1 book Appointment A1 to see Doctor D1 at 9:00 on 1st Oct 2026, then tried book another appointment A2 to see the same doctor at the same time. The expected ValueError is not raised.
+- Expected behaviour and requirement: Under FR-05 / AC-04.1, a second appointment for the same practitioner at the same time must be rejected with ValueError. AC-04.2 allows a different practitioner to be booked at that same time.
+- Minimal synthetic reproduction steps: From project/, run "python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner". The test creates a fresh store, registers P1, D1, and D2, books A1 for D1, then attempts A2 for D1 at the same time. It also intends to check that D2 can be booked at that time if the conflict assertion passes.
+- Meaningful failing test path/name and exact relevant failure: FAILED tests/test_starter.py::test_conflict_rule_and_different_practitioner - Failed: DID NOT RAISE <class 'ValueError'>
+  - >       with pytest.raises(ValueError):
+  - E       Failed: DID NOT RAISE <class 'ValueError'>
+  - tests\test_starter.py:127: Failed
+- Human hypothesis and intended checks: see E, F8-01.
+- Supported root cause and inspected code/runtime evidence: The inspected conflict predicate in project/smartcare/data_store.py compares practitioner IDs using != (around line 110). That means an existing D1 appointment is not considered a conflict for a new D1 booking, while a different practitioner at that time may incorrectly be considered one. AppointmentService.book_appointment calls this predicate before storing the new appointment. This code evidence matches the reported failure; targeted tests should confirm it after repair.
+- Smallest justified fix / diff / why other behaviour is preserved: Change only the practitioner comparison from != practitioner_id to == practitioner_id, retaining the existing appointment-ID exclusion, time equality, and scheduled-status checks. This should reject a same-practitioner conflict while preserving the allowed same-time booking for a different practitioner. Verify both cases with tests after the change.
+- Repair SHA / focused verification result: [complete]
 
 - Symptom / observed behaviour: [complete]
 - Expected behaviour and requirement: [complete]
@@ -132,6 +144,11 @@ Response and reason: [complete]
 Complete both entries BEFORE Copilot. C/D supply observed/expected/reproduction/test; retain those initial facts and link them here.
 
 ### F8-01 human entry
+(Issue 31)
+Likely cause and why plausible: My initial hypothesis is that the practitioner ID comparison in the conflict check may be incorrect. This is plausible because the reported tests show a same-practitioner, same-time booking was accepted, while a different-practitioner booking at that time was rejected. 
+Evidence intended to inspect / competing explanation / discriminating check: I will inspect the failing assertion, the stored appointment’s practitioner ID, time and status, and the book_appointment → conflict-check path. A competing explanation is that the test setup passes a different practitioner ID or datetime than intended. I will verify the actual values and compare the conflict-check result for D1 and D2 using the same store.
+Member and saved sequence/time or commit showing this preceded consultation: Sophie, Commit:
+
 Likely cause and why plausible: [complete]
 Evidence intended to inspect / competing explanation / discriminating check: [complete]
 Member and saved sequence/time or commit showing this preceded consultation: [complete]
@@ -147,7 +164,19 @@ Use the full handout prompt separately for BOTH defects, after E. Keep each actu
 
 ### F8-01 Copilot review
 Actual prompt / output reference and member: [complete]
-1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
+1. Issue 31 (Sophie) : Actual prompt:fix the test function `test_conflict_rule_and_different_practitioner` and explain 
+  - Ranked suggestion: The rejection and list assertions verify the failed booking did not add A2 or alter A1; the final assertions verify the valid D2 booking was stored.
+  - evidence check: The test’s expected behavior is correct: AC-04.1 rejects the same practitioner at the same time; AC-04.2 allows a different practitioner at that time. Don’t weaken the assertions to make faulty application code pass. Here’s a clearer version with state checks
+  - observed evidence: Copy code to 'test_regressions.py' then run command in project dir 'python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner'
+  - correct, partly correct or wrong: wrong, FAILED tests/test_regressions.py::test_conflict_rule_and_different_practitioner - Failed: DID NOT RAISE <class 'ValueError'>
+  - accept, modify or reject with reason: Modify, and ask with follow-up question to fix the issue 
+  - follow-up prompt: How to fix the code and pass the test?
+  - Ranked suggestion: In project/smartcare/data_store.py, fix the practitioner comparison inside has_practitioner_conflict: appointment.practitioner.practitioner_id == practitioner_id
+  - evidence check: It currently uses !=, which reverses the intended match: it misses conflicts for the same practitioner and may report conflicts for different practitioners. Keep the existing appointment-ID exclusion, exact-time check, and SCHEDULED check.
+  - observed evidence: From project/, run the focused test: python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner
+  - correct, partly correct or wrong: Correct, tests\test_regressions.py . 1 passed in 0.07s
+  - accept, modify or reject with reason: Accept, the test is pass
+
 2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
 3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
 Final human conclusion and comparison with initial hypothesis: [complete]
@@ -163,7 +192,13 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 before repair | [complete] | [complete] | [complete] |
+| F8-01 before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner [stage08/issue31](D:\PycharmProjects\st1-assignment3\project>) | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
+| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 before repair | [complete]  | [complete] | [complete] |
+| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 before repair | [complete]  | [complete] | [complete] |
+| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
 | F8-02 before repair | [complete] | [complete] | [complete] |
 | F8-02 after repair | [complete] | [complete] | [complete] |
@@ -188,7 +223,7 @@ Issues for both defects / refactor scope and owners:
   - F8-01: 
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/27 ()
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/28 ()
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/31 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/31 (Sophie)
   - F8-02:
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 ()
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 ()
