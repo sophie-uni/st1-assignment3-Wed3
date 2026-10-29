@@ -193,7 +193,7 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
 | F8-01 before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner [stage08/issue31](D:\PycharmProjects\st1-assignment3\project>) | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
-| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
@@ -248,11 +248,11 @@ Each member's substantive contribution and artefact: [complete]
 
 1. What should an engineer do before changing code in response to a failure? (Sophie)
 
-Response: [complete]
+Response: Before changing code, reproduce and record the failure: capture the failing test, command, code SHA, traceback, expected versus observed behaviour, and the requirement involved. Reduce it to a minimal case, inspect the relevant call path and state, and record a hypothesis plus checks that distinguish it from alternatives. Confirm the test matches the requirement; then use the evidence to identify the cause and make the smallest justified fix. This avoids fixing the wrong problem or masking a test defect.
 
 2. Where should expected behaviour come from during debugging? (Sophie)
 
-Response: [complete]
+Response: Expected behaviour should come from the approved requirements baseline, especially the relevant acceptance criterion, and any documented domain or service contract, not from assumptions about what the current code does. 
 
 3. What is a debugging hypothesis? (Hassan)
 
