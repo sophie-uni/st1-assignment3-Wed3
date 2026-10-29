@@ -54,3 +54,22 @@ def test_conflict_rule_and_different_practitioner() -> None:
     assert second.date_time == when
     assert second.status is AppointmentStatus.SCHEDULED
     assert data_store.list_appointments() == [first, second]
+
+
+"""Issue 25, Sophie"""
+def test_cancel_appointment_returns_and_retains_cancelled_appointment() -> None:
+    store = SmartCareDataStore()
+    PatientService(store).register_patient("P1", "Sophie Jiang")
+    PractitionerService(store).register_practitioner(
+        "D1", "Sophie Doctor", "General"
+    )
+    service = AppointmentService(store)
+    appointment = service.book_appointment(
+        "A1", "P1", "D1", datetime(2026, 10, 1, 9)
+    )
+
+    cancelled = service.cancel_appointment("A1")
+
+    assert cancelled is appointment
+    assert cancelled.status is AppointmentStatus.CANCELLED
+    assert store.find_appointment("A1") is appointment
