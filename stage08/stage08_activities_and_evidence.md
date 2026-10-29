@@ -117,6 +117,7 @@ Response and reason: [complete]
 - Human hypothesis and intended checks: see E, F8-01.
 - Supported root cause and inspected code/runtime evidence: The inspected conflict predicate in project/smartcare/data_store.py compares practitioner IDs using != (around line 110). That means an existing D1 appointment is not considered a conflict for a new D1 booking, while a different practitioner at that time may incorrectly be considered one. AppointmentService.book_appointment calls this predicate before storing the new appointment. This code evidence matches the reported failure; targeted tests should confirm it after repair.
 - Smallest justified fix / diff / why other behaviour is preserved: Change only the practitioner comparison from != practitioner_id to == practitioner_id, in data_store.py line 110.
+- Repair SHA / focused verification result: 6f0f25df9e82401abaeb71b4c938c2513684f78f tests\test_regressions.py . 1 passed in 0.07stests\test_regressions.py . 1 passed in 0.07s
 
 (Issue 25)
 - Symptom / observed behaviour: Cancel an appointment, then try to find the appointment in the system, return none
@@ -128,9 +129,9 @@ Response and reason: [complete]
   - E        +    where find_appointment = <smartcare.data_store.SmartCareDataStore object at 0x000001C397D6C830>.find_appointment
   - tests\test_services.py:71: AssertionError
 - Human hypothesis and intended checks: see E, F8-01.
-- Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
-- Smallest justified fix / diff / why other behaviour is preserved: [complete]
-- Repair SHA / focused verification result: [complete]
+- Supported root cause and inspected code/runtime evidence: find_appointment() keeps blank-ID validation and makes cancelled appointments retrievable. Leave the conflict check’s `SCHEDULED` filter in place, so cancelled history is retained without blocking the slot.
+- Smallest justified fix / diff / why other behaviour is preserved: in project/smartcare/data_store.py, find_appointment() is filtering cancelled records out, change to don't filter.
+- Repair SHA / focused verification result: af558dc247252b1f7b00535d7b481c3083378acc tests\test_regressions.py . 1 passed in 0.07s
 
 - Symptom / observed behaviour: [complete]
 - Expected behaviour and requirement: [complete]
@@ -216,10 +217,10 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner [stage08/issue31](D:\PycharmProjects\st1-assignment3\project>) | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
+| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
 | F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment | [complete] |
-| F8-01 (issue 25) after repair | [complete] | [complete] | [complete] |
+| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F  |
+| F8-01 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
