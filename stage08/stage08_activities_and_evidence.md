@@ -5,12 +5,12 @@ UG and PG | One evolving group project | Complete this blank record using the St
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
 Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
-Members and UG/PG cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Heiu
+Members and UG/PG cohorts: Sophie Jiang, Hassan Ahmad, Devam, Trung Hieu
 Record owner / contribution links for each member: https://github.com/sophie-uni/st1-assignment3-Wed3/pulls?q=is%3Apr+state%3Aclosed
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
-## A. Tutorial activities
+## A. Tutorial activities   
 
 ### A.1 Classify all five statements
 For each, choose symptom, evidence or hypothesis/opinion, and explain your reason. These are discussion statements, not confirmed diagnoses.
@@ -25,6 +25,7 @@ Response and reason:
 - Appointment disappears after cancellation.(Sophie)
   - Response and reason: **Symptom** It describes the observed problem, but doesn’t explain its cause.
 - The data-store removal path is probably being called. (Trung)
+  - Response and reason: Hypothesis. It suggests a likely cause of the defect, but it is not direct evidence and has not yet been confirmed by test output or code inspection.
 - The failing test shows store.find_appointment('A1') returns None. (Hassan)
 - The service layer is badly designed. (Devam)
 - Traceback points to smartcare/services.py line 42 in the example. (Sophie)
@@ -54,7 +55,25 @@ Response and reason: [complete]
 ### A.5 Traceback and hypothesis ranking (Trung)
 Using one actual failure, identify its exception/assertion, expected and observed values, test line, application call path and supporting requirement. List three plausible causes and rank them by fit with the available evidence. For each cause, name a check that could distinguish it from the others. Explain why a traceback alone does not establish the cause.
 
-Response and reason: [complete]
+Response and reason:
+- Using the actual failure, the exception/assertion is that the appointment lookup after cancellation does not return the expected appointment object. The failing assertion is effectively:
+  - Expected: store.find_appointment("A1") returns the cancelled appointment
+  - Observed: store.find_appointment("A1") returns None
+- This is supported by the requirement for FR-07 and AC-05.2, which states that cancelled history remains retrievable in the current session. The application call path is the cancellation flow: booking an appointment, invoking the cancellation method, then checking the store for the appointment. The likely failure point is in the service or data-store logic that handles cancellation, rather than in the test itself.
+- The most plausible causes, ranked by evidence, are:
+  - The cancellation path is deleting the appointment from the data store instead of keeping it as a cancelled record.
+    - This is the strongest hypothesis because it directly matches the observation that the appointment is no longer retrievable after cancellation.
+    - It also aligns with the requirement that cancelled history remains accessible.
+  - The service layer is calling the wrong method during cancellation, such as removal or cleanup instead of a status transition.
+    - This is likely if the service directly manipulates the store rather than updating the appointment state.
+    - The symptoms are consistent with an object being lost from persistence rather than merely changing status.
+  - The cancellation logic updates the appointment state but does not preserve the object in the current session store.
+    - This could happen if the store is rebuilding or reindexing its collection after mutation.
+    - The evidence is weaker than the direct removal hypothesis, but it still explains why the item becomes unfindable.
+  - A second issue in the same service path is interfering with cancellation, such as an invalid state guard or a misordered mutation.
+    - This is less likely because the primary symptom is that the record disappears, not that the status remains wrong.
+    - It would still be worth checking if the cancellation method validates the state before mutating and whether an exception path leaves the record in a partial state.
+- A traceback alone does not establish the cause. It only identifies where the program failed. In this case, the traceback may point into the service or store method, but it does not prove whether the root issue is deletion, status transition, or incorrect store update. The actual cause must be confirmed by inspecting the cancellation flow, comparing the expected state against the stored data, and checking the requirement contract.
 
 ### A.6 Exit question (Hassan)
 Why is changing code immediately after seeing a failure often a poor debugging strategy?
@@ -143,6 +162,60 @@ Response and reason: [complete]
 - Repair SHA / focused verification result: [complete]
 
 ## D. F8-02 diagnosis and repair
+(Issue 26)
+- Symptom / observed behaviour: Repeated cancellation raises LookupError instead of ValueError.
+- Expected behaviour and requirement: Under the cancellation contract, a second cancellation attempt on an already cancelled appointment must be rejected with ValueError, and the appointment state must remain CANCELLED with no further mutation.
+- Minimal synthetic reproduction steps:
+  - Register a valid patient and practitioner.
+  - Book appointment A1.
+  - Cancel A1 once.
+  - Call cancel_appointment('A1') a second time.
+  - Observe the exception type and state of the appointment.
+- Failing test path and error:
+  - Test: tests/test_services.py::test_repeated_service_cancellation_is_rejected
+  - Failure: Got LookupError: Appointment not found.
+  - The test expects ValueError and a state check that the appointment remains cancelled.
+- Human hypotheses and checked evidence:
+  - Hypothesis 1: The service removes the appointment from the store on the first cancellation, so the second call cannot find it and raises LookupError.
+  - Hypothesis 2: The cancellation method does not check the status guard before lookup, so it attempts to fetch an already-removed object.
+  - Hypothesis 3: The service is treating “missing from store” as the error path instead of “invalid transition” as the required ValueError path.
+- Supported root cause and insight:
+  - The evidence points to a cancellation flow that is not validating the status before performing the second removal/lookup.
+  - The store is likely mutating by deleting or removing the appointment during the first cancellation, which makes the second call fail with LookupError rather than the required ValueError.
+  - The correct contract is not “missing appointment,” but “attempt to cancel an already cancelled appointment is invalid.”
+- Smallest justified repair:
+  - In the service cancellation method, first check the appointment exists and is currently SCHEDULED.
+  - If the appointment is already CANCELLED, raise ValueError("Only SCHEDULED appointments may be cancelled").
+  - Only when the status is SCHEDULED should the service mutate the appointment to CANCELLED.
+  - Preserve the existing appointment in the store; do not delete it.
+- Final note: This fix is minimal and directly addresses the defect without broadening scope. It preserves cancellation history while enforcing the required state transition rules.
+- Repair SHA / focused verification result: f6fdd1ca18af414a97ffd13b09dce7456549d0c1, tests\test_regressions.py . 1 passed in 0.05s 
+
+(Issue 29)
+- Symptom / observed behaviour: A cancelled appointment still blocks a slot when checking availability for a new appointment.
+- Expected behaviour and requirement: A cancelled appointment must no longer occupy the practitioner's time slot. Once an appointment is cancelled, the slot should be free for a new booking at the same time.
+- Minimal synthetic reproduction steps:
+  - Book appointment A1 for practitioner D1 at a conflict time.
+  - Cancel A1.
+  - Attempt to book A2 for the same practitioner and same time.
+  - Confirm whether the slot is still considered blocked.
+- Failing test path and error:
+  - Test: tests/test_services.py::test_cancelled_appointment_does_not_block_slot
+  - Failure: Expected appointment was None. or, effectively, the second appointment is rejected because the cancelled appointment still appears to occupy the slot.
+- Human hypotheses and checked evidence:
+  - Hypothesis 1: The cancellation path is leaving the cancelled appointment in the store but not updating the conflict-check logic, so time availability still sees it as booked.
+  - Hypothesis 2: The slot-check logic is scanning all appointments without filtering out CANCELLED ones.
+  - Hypothesis 3: The cancelled appointment remains in the internal collection with an active booking flag, causing the practitioner/time conflict check to reject the new booking.
+- Supported root cause and insight:
+  - The root cause is likely in the conflict detection logic, not in appointment creation itself.
+  - The data model allows a cancelled record to remain in the system, but the slot-based availability check is still treating it as an active booking.
+  - In other words, the appointment is preserved for history, but not correctly excluded from conflict checks.
+- Smallest justified repair:
+  - Update the slot availability logic to ignore appointments whose status is CANCELLED.
+  - Keep the cancelled record in the store for history, but exclude it from conflict resolution while checking for a free slot.
+  - Ensure that cancel_appointment sets status to CANCELLED without deleting the historical record.
+- Final note: This is the minimal, contract-preserving fix: cancelled records remain traceable, but no longer block new bookings. It matches the requirement that historical data is retained while freed slots are available again.
+- Repair SHA / focused verification result: f6fdd1ca18af414a97ffd13b09dce7456549d0c1, tests\test_regressions.py . 1 passed in 0.08s 
 
 - Symptom / observed behaviour: [complete]
 - Expected behaviour and requirement: [complete]
@@ -173,6 +246,16 @@ Evidence intended to inspect / competing explanation / discriminating check: [co
 Member and saved sequence/time or commit showing this preceded consultation: [complete]
 
 ### F8-02 human entry
+(Issue 26)
+Likely cause and why plausible: My initial hypothesis is that the service cancellation method is removing the appointment from the store on the first cancellation, so the second call hits a missing-record path before it can validate the illegal state transition. This is plausible because the second cancellation is on an already-cancelled appointment, and the code appears to be checking whether the appointment exists rather than whether it is still in a cancellable state.
+Evidence intended to inspect / competing explanation / discriminating check: I will inspect the cancel_appointment service method, the data-store mutation path, and the appointment status guard. A competing explanation is that the service reaches the state check but raises the wrong exception type; however, the observed LookupError: Appointment not found is much more consistent with a removal/delete path than with a status validation failure. I will verify the actual values and compare the cancellation flow against the required contract: if the appointment is already cancelled, it should raise ValueError and leave the record unchanged. 
+Member and saved sequence/time or commit showing this preceded consultation: Trung, commit: f6fdd1ca18af414a97ffd13b09dce7456549d0c1
+
+(Issue 29)
+Likely cause and why plausible: My initial hypothesis is that the slot availability/conflict check is still counting cancelled appointments as active bookings. This is plausible because the requirement says cancelled appointments must remain in the store for history, but they should no longer occupy the time slot.
+Evidence intended to inspect / competing explanation / discriminating check: I will inspect the conflict-check function in the service or data-store layer and check whether it filters appointments by status == SCHEDULED before comparing practitioner and time. A competing explanation is that the appointment was not actually cancelled, but the status mutation is failing silently. I will verify the actual values and compare the appointment record before and after cancellation to confirm whether it remains in the store but is incorrectly treated as active.
+Member and saved sequence/time or commit showing this preceded consultation: Trung, commit: f6fdd1ca18af414a97ffd13b09dce7456549d0c1
+
 Likely cause and why plausible: [complete]
 Evidence intended to inspect / competing explanation / discriminating check: [complete]
 Member and saved sequence/time or commit showing this preceded consultation: [complete]
@@ -207,7 +290,21 @@ Actual prompt / output reference and member:
 Final human conclusion and comparison with initial hypothesis: [complete]
 
 ### F8-02 Copilot review
-Actual prompt / output reference and member: [complete]
+Actual prompt / output reference and member:
+1. Issue 26 (Trung) :  Actual prompt: fix the test function `test_repeated_service_cancellation_is_rejected` and explain
+- Ranked suggestion: The test is correct to expect a ValueError and state preservation. The root problem is not the assertion; it is the service cancellation logic. A second cancellation should reject the invalid transition, not fail with a missing-appointment lookup error.
+- evidence check: The current logic likely handles the second call as “not found” instead of “illegal state transition”. The fix should preserve the cancelled record and reject the second cancellation with a ValueError.
+- observed evidence: The test reports, from project/, run the focused test: python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected:
+- correct, partly correct or wrong: accept, modify or reject with reason: Correct, tests\test_regressions.py . 1 passed in 0.05s; The test is valid and the service should be modified.
+- accept, modify or reject with reason: Accept, the test is pass
+
+2. Issue 29 (Trung) :  Actual prompt: fix the test function `test_cancelled_appointment_does_not_block_slot` and explain
+- Ranked suggestion: In the conflict logic, filter out cancelled appointments before checking for practitioner/time collisions. The cancelled record can remain in the store for historical traceability, but it must not be included in the active slot-check.
+- evidence check: The service or data-store slot check is likely iterating over all appointments without excluding CANCELLED records. The fix should keep the record but treat it as inactive for availability checks.
+- observed evidence: running the focused test pytest tests/test_regressions.py::test_cancelled_appointment_does_not_block_slot shows that the second appointment is rejected correctly.
+- correct, partly correct or wrong: accept, modify or reject with reason: Accept the test and modify the conflict-check logic. The bug is in the availability calculation, not in the requirement or the test.
+- accept, modify or reject with reason: Accept, the test is pass
+  
 1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
 2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
 3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
@@ -217,14 +314,17 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
-| F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F  |
+| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
+| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F |
 | F8-01 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
 | F8-01 before repair | [complete]  | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-02 (issue 26) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_repeated_service_cancellation_is_rejected FAILED |
+| F8-02 (issue 26) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.05s |
+| F8-02 (issue 29) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_cancelled_appointment_does_not_block_slot FAILED |
+| F8-02 (issue 29) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.08s |
 | F8-02 before repair | [complete] | [complete] | [complete] |
 | F8-02 after repair | [complete] | [complete] | [complete] |
 | Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
@@ -252,8 +352,8 @@ Issues for both defects / refactor scope and owners:
   - F8-02:
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 ()
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 (Sophie)
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 ()
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 (Trung)
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 (Trung)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 ()
 Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
 PR link and another member's reviewer identity: [complete]
@@ -301,15 +401,14 @@ Response: [complete]
 
 8. What is a code smell? (Trung)
 
-Response: [complete]
+Response: A code smell is a signal that the code may be poorly designed or harder to maintain, even if it still works. It usually points to a quality issue such as duplicated logic, unclear responsibility, hidden side effects, overly complex conditions, or a violation of the intended design. In debugging, a code smell is not necessarily the root cause, but it is a warning that the implementation may be fragile or inconsistent with the requirements.
 
 9. How should GitHub Copilot-generated debugging diagnoses be treated? (Trung)
 
-Response: [complete]
-
+Response: GitHub Copilot-generated debugging diagnoses should be treated as hypotheses, not proof. They can be useful for suggesting likely causes, but they must be checked against actual evidence, the failing test, the current code, and the requirement contract before being accepted. A generated diagnosis is only as good as the evidence behind it. It should never replace direct inspection, root-cause analysis, or validation by running the relevant tests.
 10. What is the Stage 8 engineering rule? (Trung)
 
-Response: [complete]
+Response: The Stage 8 engineering rule is that a fix must be justified by evidence and tied to the actual defect. You must not change code based only on a guess, a vague suspicion, or an AI-generated suggestion. The repair must be minimal, supported by a clear diagnosis, and validated with focused regression tests. If the defect is fixed, the evidence must show the failure was addressed without introducing new regressions.
 
 ## L. Completion and handover
 
