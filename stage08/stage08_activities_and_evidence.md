@@ -394,7 +394,7 @@ PR link and another member's reviewer identity:
 Key human feedback, difference from Copilot findings and response/outcome: Not available
 Actual review approval / merge evidence: PR reviewed and merged by different team members
 Integrated code SHA and team pull/retest command / working directory / result:
-- Integrated code SHA and team pull: 
+- Integrated code SHA and team pull: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/40
 - retest command: python -m pytest tests/test_regressions.py
 - working directory:project\tests\test_regressions.py
 - result: 8 passed in 0.07s
