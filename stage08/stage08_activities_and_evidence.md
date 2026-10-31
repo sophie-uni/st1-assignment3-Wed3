@@ -316,19 +316,22 @@ Actual prompt / output reference and member:
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F |
-| F8-01 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 before repair | [complete]  | [complete] | [complete] |
-| F8-01 after repair | [complete] | [complete] | [complete] |
-| F8-01 before repair | [complete]  | [complete] | [complete] |
-| F8-01 after repair | [complete] | [complete] | [complete] |
+| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
+| F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
+| F8-01 (issue 27) before repair |   | [complete] | [complete] |
+| F8-01 (issue 27) after repair | [complete] | [complete] | [complete] |
+| F8-01 (issue 28) before repair |   | [complete] | [complete] |
+| F8-01 (issue 28) after repair | [complete] | [complete] | [complete] |
+| F8-02 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F |
+| F8-02 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
 | F8-02 (issue 26) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_repeated_service_cancellation_is_rejected FAILED |
 | F8-02 (issue 26) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.05s |
 | F8-02 (issue 29) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_cancelled_appointment_does_not_block_slot FAILED |
 | F8-02 (issue 29) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.08s |
-| F8-02 before repair | [complete] | [complete] | [complete] |
-| F8-02 after repair | [complete] | [complete] | [complete] |
+| F8-02 (issue 24) before repair | | [complete] | [complete] |
+| F8-02 (issue 24) after repair | [complete] | [complete] | [complete] |
+| F8-02 (issue 30) before repair |  | [complete] | [complete] |
+| F8-02 (issue 30) after repair | [complete] | [complete] | [complete] |
 | Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
 
 Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
@@ -336,8 +339,16 @@ Unrelated failures investigated / resolution: [complete or not applicable with r
 
 ## H. Refactoring decision and before/after verification (Sophie)
 
-Smell and exact location: [complete]
-Small proposed structural change / why justified: [complete before editing]
+Smell and exact location: 
+
+Both F8-01 and F8-02 should fix in data_store.py
+
+Small proposed structural change / why justified: 
+- F8-01, in data_store.py
+  - line 110, 'and appointment.practitioner.practitioner_id != practitioner_id', should be 'and appointment.practitioner.practitioner_id == practitioner_id'
+- F8-02, in data_store.py
+  - line 94 is not required
+
 External behaviour to preserve / relevant tests: [complete]
 Before result: see G, full passing suite.
 Actual change / diff / separate refactor SHA: [complete]
@@ -348,15 +359,15 @@ Result — accepted, revised or rejected / reason / behaviour-preservation concl
 
 Issues for both defects / refactor scope and owners: 
   - F8-01: 
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/27 ()
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/28 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/27 (Sophie)
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/28 (Sophie)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/31 (Sophie)
   - F8-02:
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/24 (Sophie)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/25 (Sophie)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 (Trung)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 (Trung)
-    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 ()
+    - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 (Sophie)
 Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
 PR link and another member's reviewer identity: [complete]
 Key human feedback, difference from Copilot findings and response/outcome: [complete]
