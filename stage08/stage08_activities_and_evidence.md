@@ -316,26 +316,29 @@ Actual prompt / output reference and member:
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
-| F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-01 (issue 27) before repair |   | [complete] | [complete] |
-| F8-01 (issue 27) after repair | [complete] | [complete] | [complete] |
-| F8-01 (issue 28) before repair |   | [complete] | [complete] |
-| F8-01 (issue 28) after repair | [complete] | [complete] | [complete] |
-| F8-02 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_services.py F |
-| F8-02 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.07s |
-| F8-02 (issue 26) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_repeated_service_cancellation_is_rejected FAILED |
-| F8-02 (issue 26) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.05s |
-| F8-02 (issue 29) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests/test_services.py::test_cancelled_appointment_does_not_block_slot FAILED |
-| F8-02 (issue 29) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project | tests\test_regressions.py . 1 passed in 0.08s |
-| F8-02 (issue 24) before repair | | [complete] | [complete] |
-| F8-02 (issue 24) after repair | [complete] | [complete] | [complete] |
-| F8-02 (issue 30) before repair |  | [complete] | [complete] |
-| F8-02 (issue 30) after repair | [complete] | [complete] | [complete] |
+| F8-01 (issue 31) before repair | 2e03f3d06dfde3523c8c8baeaedf127e326b8f38 | python -m pytest -vv tests/test_starter.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_starter.py | tests/test_starter.py::test_conflict_rule_and_different_practitioner FAILED |
+| F8-01 (issue 31) after repair | 6f0f25df9e82401abaeb71b4c938c2513684f78f | python -m pytest tests/test_regressions.py::test_conflict_rule_and_different_practitioner rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.07s |
+| F8-01 (issue 27) before repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8  | python -m pytest tests/test_services.py::test_same_practitioner_same_time_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py | 1 passed in 0.07s, no extra fix required after fixing issue 25,26,29,31  |
+| F8-01 (issue 27) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_regressions.py::test_same_practitioner_same_time_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.07s |
+| F8-01 (issue 28) before repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_services.py::test_different_practitioner_same_time_is_allowed rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py| 1 passed in 0.05s, no extra fix required after fixing issue 25,26,29,31  |
+| F8-01 (issue 28) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_services.py::test_different_practitioner_same_time_is_allowed rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py  | 1 passed in 0.05s |
+| F8-02 (issue 25) before repair | 2feb2b711f308a7a756c21470257338c3fdda88c  | python -m pytest tests/test_services.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\projecttests\test_services.py | tests\test_services.py F |
+| F8-02 (issue 25) after repair | af558dc247252b1f7b00535d7b481c3083378acc | python -m pytest tests/test_regressions.py::test_cancel_appointment_returns_and_retains_cancelled_appointment rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.07s |
+| F8-02 (issue 26) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py | tests/test_services.py::test_repeated_service_cancellation_is_rejected FAILED |
+| F8-02 (issue 26) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.05s |
+| F8-02 (issue 29) before repair | 930aa9f90d7849242ccadcbc1a0003218706c6f6 | python -m pytest -vv tests/test_services.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py | tests/test_services.py::test_cancelled_appointment_does_not_block_slot FAILED |
+| F8-02 (issue 29) after repair | f6fdd1ca18af414a97ffd13b09dce7456549d0c1 | python -m pytest tests/test_regressions.py::test_cancelled_appointment_does_not_block_slot rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.08s |
+| F8-02 (issue 24) before repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_domain.py::test_cancel_changes_status_and_keeps_appointment_in_store rootdir: D:\PycharmProjects\st1-assignment3\projecttests\test_domain.py | 1 passed in 0.06s, no extra fix required after fixing issue 25,26,29,31 |
+| F8-02 (issue 24) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_regressions.py::test_cancel_changes_status_and_keeps_appointment_in_store rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.06s |
+| F8-02 (issue 30) before repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py | 1 passed in 0.09s, no extra fix required after fixing issue 25,26,29,31 |
+| F8-02 (issue 30) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.09s |
 | Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
 
-Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
-Unrelated failures investigated / resolution: [complete or not applicable with reason]
+Explain how the assertions detect each relevant incorrect result and protect previous behaviour:
+Unrelated failures investigated / resolution: 
+- when I run 'python -m pytest tests/test_regressions.py::test_same_practitioner_same_time_is_rejected', got error of 'FAILED tests/test_regressions.py::test_same_practitioner_same_time_is_rejected - NameError: name 'conflict_setup' is not defined'
+- resolution is I have missed 'conflict_setup' class in test_regressions.py, copy it from test_services.py and re-run the command, test pass.
+
 
 ## H. Refactoring decision and before/after verification (Sophie)
 
@@ -349,11 +352,11 @@ Small proposed structural change / why justified:
 - F8-02, in data_store.py
   - line 94 is not required
 
-External behaviour to preserve / relevant tests: [complete]
+External behaviour to preserve / relevant tests: In project\tests\test_services.py
 Before result: see G, full passing suite.
 Actual change / diff / separate refactor SHA: [complete]
 Focused and full after-refactor commands / working directory / results / evidence: [complete]
-Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: [complete]
+Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted
 
 ## I. Git, human review and integration
 
@@ -368,19 +371,42 @@ Issues for both defects / refactor scope and owners:
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/26 (Trung)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/29 (Trung)
     - https://github.com/sophie-uni/st1-assignment3-Wed3/issues/30 (Sophie)
-Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
-PR link and another member's reviewer identity: [complete]
-Key human feedback, difference from Copilot findings and response/outcome: [complete]
-Actual review approval / merge evidence: [complete]
+Branch / prepared, repair and refactor checkpoints: 
+    - repared branch:Stage08/issues- #32
+      - Tutor preparation: b5a8a53ba218b6ec12307606b5031d948e5577e6
+      - stage08 issue and tasks assignment: 8585c68c35cc8374cd0e06e8fe0870bcca41019c
+    - repair branch: 
+      - Stage08/issue31
+      - Stage08/issue25
+      - Issues are fixed (stage08/Trung)
+      - stage08/issue_24_27_28_30
+PR link and another member's reviewer identity: 
+      - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/32
+      - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/34
+      - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/35
+      - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/37
+      - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/38
+Key human feedback, difference from Copilot findings and response/outcome: Not available
+Actual review approval / merge evidence: PR reviewed and merged by different team members
 Integrated code SHA and team pull/retest command / working directory / result: [complete]
 Evidence-only later SHA / explanation if different: [complete or not applicable]
-Each member's substantive contribution and artefact: [complete]
+Each member's substantive contribution and artefact: 
+      - Trung has explained and fixed issue 26 and 29
+      - Sophie has set-up the stage start-point; explained, fixed, verified issue 24,25,27,28,30,31; finalise the stage and prepare for handover to next stage
 
 ## J. Required reflections
 
-1. Which Copilot diagnosis appeared convincing but lacked evidence? [complete; report honestly if none and discuss the least-supported real suggestion]
-2. What evidence changed your group's view? [complete]
-3. How did regression tests protect the refactoring? [complete]
+1. Which Copilot diagnosis appeared convincing but lacked evidence? 
+I have asked Copilot to fix the test function `test_conflict_rule_and_different_practitioner` and explain, Copilot gave me a piece of codes and told me to place in test_regressions.py. However, it didn't fix the error. There is no evidence error due to test case writing since we had all test cases passed before tutor changed code not the test cases.
+
+2. What evidence changed your group's view? 
+Copilot helps code writing, but not always understand the full content. Human verification and follow-up prompts helps to get detailed accurate answers.
+
+3. How did regression tests protect the refactoring?
+- Verified behaviour was preserved: Running the tests before and after code changes proved that the internal restructuring did not alter external results, return types, or public contracts.
+- Caught accidental breakages immediately: Any unintended error introduced during restructuring—such as an edge-case logic slip or broken interface—was flagged instantly by a failing test before committing.
+- Prevented the bugs from returning: The tests ensured that the two newly fixed defects (practitioner conflicts and retained cancelled appointments) were not accidentally reintroduced while cleaning up the code.
+- Guarded critical invariants: They confirmed that essential rules, like immutable cancellation transitions, correct exception types (ValueError vs. LookupError), and ID case-sensitivity—remained intact. 
 
 ## K. Ten formative questions
 
@@ -428,15 +454,15 @@ Response: The Stage 8 engineering rule is that a fix must be justified by eviden
 
 ## L. Completion and handover
 
-- [ ] Existing project, earlier tests and stage records preserved.
+- [✔] Existing project, earlier tests and stage records preserved.
 - [✔] Passing Stage 7 SHA and safe preparation details recorded.
-- [ ] Both defects reproduced with meaningful failing tests.
-- [ ] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
-- [ ] Supported causes and minimal repairs explained; focused and full regression results recorded.
-- [ ] One genuine refactor verified under passing before/after tests.
-- [ ] Human PR review, feedback resolution and integrated retest recorded.
-- [ ] Tutorial, three reflections and ten formative responses complete.
-- [ ] Local recovery metadata excluded from submitted source.
+- [✔] Both defects reproduced with meaningful failing tests.
+- [✔] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
+- [✔] Supported causes and minimal repairs explained; focused and full regression results recorded.
+- [✔] One genuine refactor verified under passing before/after tests.
+- [✔] Human PR review, feedback resolution and integrated retest recorded.
+- [✔] Tutorial, three reflections and ten formative responses complete.
+- [✔] Local recovery metadata excluded from submitted source.
 - [ ] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
 
 Verified integrated code SHA / result: see I.

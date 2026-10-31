@@ -16,6 +16,7 @@ from smartcare.services import (
     PractitionerService,
 )
 
+BOOKING_TIME = datetime(2026, 10, 1, 9, 0)
 
 def foundation() -> tuple[
     SmartCareDataStore,
@@ -32,6 +33,41 @@ def foundation() -> tuple[
         data_store,
     ).register_practitioner('D1', 'Taylor Example', 'General')
     return (data_store, patient, practitioner, AppointmentService(data_store))
+
+def cancellation_setup() -> tuple[
+    SmartCareDataStore,
+    AppointmentService,
+    Appointment,
+]:
+    """Create a fresh store holding one SCHEDULED appointment A1."""
+    data_store = SmartCareDataStore()
+    PatientService(data_store).register_patient('P1', 'Alex Example')
+    PractitionerService(data_store).register_practitioner(
+        'D1',
+        'Taylor Example',
+        'General',
+    )
+    appointment_service = AppointmentService(data_store)
+    appointment = appointment_service.book_appointment(
+        'A1',
+        'P1',
+        'D1',
+        datetime(2026, 10, 1, 9, 0),
+    )
+    return data_store, appointment_service, appointment
+
+CONFLICT_TIME = datetime(2026, 10, 1, 9, 0)
+
+def conflict_setup() -> tuple[SmartCareDataStore, AppointmentService]:
+    """Create a fresh store with patients P1, P2 and practitioners D1, D2."""
+    data_store = SmartCareDataStore()
+    patient_service = PatientService(data_store)
+    patient_service.register_patient('P1', 'Alex Example')
+    patient_service.register_patient('P2', 'Jordan Example')
+    practitioner_service = PractitionerService(data_store)
+    practitioner_service.register_practitioner('D1', 'Taylor Example', 'General')
+    practitioner_service.register_practitioner('D2', 'Morgan Example', 'General')
+    return data_store, AppointmentService(data_store)
 
 # -------------------------------------------------------------------------
 # Regression Test 1: Defect F8-01 (Practitioner Conflict Behaviour)
@@ -162,6 +198,7 @@ def test_cancelled_appointment_does_not_block_slot() -> None:
         assert store.find_appointment("A1") is first
         assert first.status is AppointmentStatus.CANCELLED
 
+
 """Issue 24, Sophie"""
 def test_cancel_changes_status_and_keeps_appointment_in_store() -> None:
     """Cancelled appointments retain their history while transitioning state."""
@@ -186,6 +223,7 @@ def test_cancel_changes_status_and_keeps_appointment_in_store() -> None:
     assert data_store.list_appointments() == [appointment]
     assert appointment.patient is patient
     assert appointment.practitioner is practitioner
+
 
 """Issue 30, Sophie"""
 def test_repeated_service_cancellation_is_rejected() -> None:
