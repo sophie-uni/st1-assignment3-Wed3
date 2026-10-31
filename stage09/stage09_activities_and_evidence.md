@@ -10,46 +10,46 @@ Stage 8 integrated SHA, command, working directory and actual result: <!-- compl
 
 ### A1 Session state classification
 
-| Information | Required session/domain or transient state? | Requirement or reason |
-|---|---|---|
-| Patient identity | | |
-| Appointment history | | |
-| Temporary menu choice | | |
-| Practitioner specialty | | |
-| Debug print output | | |
-| Appointment status | | |
+| Information | Required session/domain or transient state? | Requirement or reason | Who |
+|---|---|---| ---|
+| Patient identity | | | Sophie |
+| Appointment history | | | Sophie |
+| Temporary menu choice | | | Hassan |
+| Practitioner specialty | | | Hassan |
+| Debug print output | | | Trung |
+| Appointment status | | | Trung |
 
-What is intentionally lost on exit? <!-- response -->
+What is intentionally lost on exit? (Hassan) <!-- response -->
 
 ### A2 Interface and domain data plan
 
 Plan before AI. This replaces schema/key design; no database tables are required.
 
-| Function or component | Explicit inputs and types | Outputs | Responsibility and validation | Domain source / existing constraint |
-|---|---|---|---|---|
-| appointment_sort_key | | | | |
-| select_appointments | | | | |
-| Service listing | | | | |
-| Console | | | | |
+| Function or component | Explicit inputs and types | Outputs | Responsibility and validation | Domain source / existing constraint | Who |
+|---|---|---|---|---|---|
+| appointment_sort_key | | | | | Trung |
+| select_appointments | | | | | Hassan |
+| Service listing | | | | | Sophie |
+| Console | | | | | Sophie |
 
 Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actual participants/date_time/status to the existing contracts: <!-- response -->
 
 ### A3 Responsibility violations
 
-| Conceptual case | Violation | Correct boundary and reason |
-|---|---|---|
-| Appointment.cancel reads input | | |
-| Service prints/reads the menu | | |
-| Query sorts its source in place | | |
-| Store prints Appointment saved | | |
+| Conceptual case | Violation | Correct boundary and reason | Who |
+|---|---|---|---|
+| Appointment.cancel reads input | | | Trung |
+| Service prints/reads the menu | | | Hassan |
+| Query sorts its source in place | | | Sophie |
+| Store prints Appointment saved | | | Sophie |
 
-### A4 Sorting comparison
+### A4 Sorting comparison (Trung)
 
 For `appointments.sort(key=appointment_sort_key)` and `result = sorted(appointments, key=appointment_sort_key)`, predict source order, return value and result identity. Give a meaningful mutation check: <!-- response -->
 
 Score-example prediction and explanation of passing the named key: <!-- response -->
 
-### A5 Exit question
+### A5 Exit question (Hassan)
 
 Explain cancellation versus deletion, and checks for same-session lookup, all-status listing and SCHEDULED-only exclusion: <!-- response -->
 
@@ -67,14 +67,14 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 
 | Requirement / test ID | Code location | Case and meaningful assertion | Actual result | Evidence link |
 |---|---|---|---|---|
-| | | | | |
+|T-QRY-01 | | | | |
 
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
 Purity explanation from code inspection, including absence of hidden state and I/O: <!-- response -->
 What the tests do and do not establish: <!-- response -->
 
-## D. Integrated console and workflow evidence
+## D. Integrated console and workflow evidence (Sophie)
 
 | Scenario / acceptance ID | Reproducible inputs / artefact | Expected result | Observed result and state check | Evidence link |
 |---|---|---|---|---|
@@ -102,7 +102,7 @@ Responsibility check: explain how domain invariants, shared-store collections, s
 2. Which Copilot suggestion did you reject as over-engineering, and why? <!-- response -->
 3. How did you prove cancelled appointments remain retrievable and listable in the same session? <!-- response -->
 
-## G. Ten formative answers
+## G. Ten formative answers (Hassan)
 
 1. What makes select_appointments pure, and what side effect breaks purity? <!-- response -->
 2. Which explicit inputs are needed, and why avoid a global store? <!-- response -->
