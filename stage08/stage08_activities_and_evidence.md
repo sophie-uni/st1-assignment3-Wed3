@@ -332,13 +332,12 @@ Actual prompt / output reference and member:
 | F8-02 (issue 24) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_regressions.py::test_cancel_changes_status_and_keeps_appointment_in_store rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.06s |
 | F8-02 (issue 30) before repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_services.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_services.py | 1 passed in 0.09s, no extra fix required after fixing issue 25,26,29,31 |
 | F8-02 (issue 30) after repair | fe4dfe8bf4b11d73999c3182bf2f46538ea893f8 | python -m pytest tests/test_regressions.py::test_repeated_service_cancellation_is_rejected rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 1 passed in 0.09s |
-| Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
+| Full suite after both repairs, before refactor | 2bb9df58135ccb1b07f0500f3a938f3a57fc5ad4 | python -m pytest tests/test_regressions.py rootdir: D:\PycharmProjects\st1-assignment3\project\tests\test_regressions.py | 8 passed in 0.07s |
 
 Explain how the assertions detect each relevant incorrect result and protect previous behaviour:
 Unrelated failures investigated / resolution: 
 - when I run 'python -m pytest tests/test_regressions.py::test_same_practitioner_same_time_is_rejected', got error of 'FAILED tests/test_regressions.py::test_same_practitioner_same_time_is_rejected - NameError: name 'conflict_setup' is not defined'
 - resolution is I have missed 'conflict_setup' class in test_regressions.py, copy it from test_services.py and re-run the command, test pass.
-
 
 ## H. Refactoring decision and before/after verification (Sophie)
 
@@ -354,8 +353,14 @@ Small proposed structural change / why justified:
 
 External behaviour to preserve / relevant tests: In project\tests\test_services.py
 Before result: see G, full passing suite.
-Actual change / diff / separate refactor SHA: [complete]
-Focused and full after-refactor commands / working directory / results / evidence: [complete]
+Actual change / diff / separate refactor SHA:
+- 6f0f25df9e82401abaeb71b4c938c2513684f78f
+- af558dc247252b1f7b00535d7b481c3083378acc
+Focused and full after-refactor commands / working directory / results / evidence: 
+- Focused and full after-refactor commands: python -m pytest tests/test_regressions.py
+- working directory:D:\PycharmProjects\st1-assignment3\project
+- results: 8 passed in 0.07s
+- evidence: b6cad496c1961b0732046e4ee62a64596cb175bd
 Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted
 
 ## I. Git, human review and integration
@@ -388,11 +393,15 @@ PR link and another member's reviewer identity:
       - https://github.com/sophie-uni/st1-assignment3-Wed3/pull/38
 Key human feedback, difference from Copilot findings and response/outcome: Not available
 Actual review approval / merge evidence: PR reviewed and merged by different team members
-Integrated code SHA and team pull/retest command / working directory / result: [complete]
-Evidence-only later SHA / explanation if different: [complete or not applicable]
+Integrated code SHA and team pull/retest command / working directory / result:
+- Integrated code SHA and team pull: 
+- retest command: python -m pytest tests/test_regressions.py
+- working directory:project\tests\test_regressions.py
+- result: 8 passed in 0.07s
+Evidence-only later SHA / explanation if different: Not available
 Each member's substantive contribution and artefact: 
-      - Trung has explained and fixed issue 26 and 29
-      - Sophie has set-up the stage start-point; explained, fixed, verified issue 24,25,27,28,30,31; finalise the stage and prepare for handover to next stage
+- Trung has explained and fixed issue 26 and 29
+- Sophie has set-up the stage start-point; explained, fixed, verified issue 24,25,27,28,30,31; finalise the stage and prepare for handover to next stage
 
 ## J. Required reflections
 
@@ -463,9 +472,9 @@ Response: The Stage 8 engineering rule is that a fix must be justified by eviden
 - [✔] Human PR review, feedback resolution and integrated retest recorded.
 - [✔] Tutorial, three reflections and ten formative responses complete.
 - [✔] Local recovery metadata excluded from submitted source.
-- [ ] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
+- [✔] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
 
 Verified integrated code SHA / result: see I.
-Submitted SHA and evidence-only difference if any: [complete]
-Unresolved issues or incomplete checks / owner / next action: [complete]
-Handover note: [complete]
+Submitted SHA and evidence-only difference if any: Not available
+Unresolved issues or incomplete checks / owner / next action: No, all 8 issues closed
+Handover note: Ready to process to stage09

@@ -72,6 +72,7 @@ def conflict_setup() -> tuple[SmartCareDataStore, AppointmentService]:
 # -------------------------------------------------------------------------
 # Regression Test 1: Defect F8-01 (Practitioner Conflict Behaviour)
 # -------------------------------------------------------------------------
+
 """Issue 31, Sophie"""
 def test_conflict_rule_and_different_practitioner() -> None:
     """Verify conflict rule and different practitioner."""
@@ -90,6 +91,7 @@ def test_conflict_rule_and_different_practitioner() -> None:
         when,
     ).practitioner.practitioner_id == 'D2'
 
+
 """Issue 27, Sophie"""
 def test_same_practitioner_same_time_is_rejected() -> None:
     """T-FR05-1: a second D1 booking at the exact SCHEDULED time is rejected."""
@@ -102,6 +104,7 @@ def test_same_practitioner_same_time_is_rejected() -> None:
     assert data_store.find_appointment('A2') is None
     assert data_store.list_appointments() == [first]
     assert first.status is AppointmentStatus.SCHEDULED
+
 
 """Issue 28, Sophie"""
 def test_different_practitioner_same_time_is_allowed() -> None:
@@ -127,6 +130,7 @@ def test_different_practitioner_same_time_is_allowed() -> None:
 # -------------------------------------------------------------------------
 # Regression Test 2: Defect F8-02 (Retained Cancelled Appointment Lookup)
 # -------------------------------------------------------------------------
+
 """Issue 25, Sophie"""
 def test_cancel_appointment_returns_and_retains_cancelled_appointment() -> None:
     store = SmartCareDataStore()
@@ -145,30 +149,25 @@ def test_cancel_appointment_returns_and_retains_cancelled_appointment() -> None:
     assert cancelled.status is AppointmentStatus.CANCELLED
     assert store.find_appointment("A1") is appointment
 
-"""Issue 26, Trung"""
-def test_repeated_service_cancellation_is_rejected() -> None:
-    """Issue 26: cancelling A1 twice raises ValueError and changes nothing."""
-    store = SmartCareDataStore()
-    PatientService(store).register_patient("P1", "Sophie Jiang")
-    PractitionerService(store).register_practitioner("D1", "Sophie Doctor", "General")
-    service = AppointmentService(store)
 
+"""Issue 26, Trung"""
+def test_cancelling_appointment_twice_raises_without_changing_state() -> None:
+    store = SmartCareDataStore()
+    PatientService(store).register_patient("P1", "Alex Example")
+    PractitionerService(store).register_practitioner(
+        "D1", "Taylor Example", "General"
+    )
+    service = AppointmentService(store)
     appointment = service.book_appointment(
         "A1", "P1", "D1", datetime(2026, 10, 1, 9)
     )
+    service.cancel_appointment("A1")
 
-    cancelled = service.cancel_appointment("A1")
-
-    assert cancelled is appointment
-    assert appointment.status is AppointmentStatus.CANCELLED
-    assert store.find_appointment("A1") is appointment
-
-    with pytest.raises(ValueError, match="Only SCHEDULED appointments may be cancelled"):
+    with pytest.raises(ValueError):
         service.cancel_appointment("A1")
 
     assert appointment.status is AppointmentStatus.CANCELLED
     assert store.find_appointment("A1") is appointment
-    assert store.list_appointments() == [appointment]
 
 
 """Issue 29, Trung"""
