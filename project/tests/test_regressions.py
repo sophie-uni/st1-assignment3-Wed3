@@ -1,3 +1,4 @@
+"""Imported from pytest, datetime, and the existing smartcare modules"""
 from datetime import datetime
 
 import pytest
@@ -32,6 +33,9 @@ def foundation() -> tuple[
     ).register_practitioner('D1', 'Taylor Example', 'General')
     return (data_store, patient, practitioner, AppointmentService(data_store))
 
+# -------------------------------------------------------------------------
+# Regression Test 1: Defect F8-01 (Practitioner Conflict Behaviour)
+# -------------------------------------------------------------------------
 """Issue 31, Sophie"""
 def test_conflict_rule_and_different_practitioner() -> None:
     data_store, _, _, appointment_service = foundation()
@@ -74,8 +78,9 @@ def test_cancel_appointment_returns_and_retains_cancelled_appointment() -> None:
     assert cancelled.status is AppointmentStatus.CANCELLED
     assert store.find_appointment("A1") is appointment
 
-
-
+# -------------------------------------------------------------------------
+# Regression Test 2: Defect F8-02 (Retained Cancelled Appointment Lookup)
+# -------------------------------------------------------------------------
 """Issue 26, Trung"""
 def test_repeated_service_cancellation_is_rejected() -> None:
     """Issue 26: cancelling A1 twice raises ValueError and changes nothing."""
