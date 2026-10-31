@@ -339,7 +339,6 @@ Unrelated failures investigated / resolution:
 - when I run 'python -m pytest tests/test_regressions.py::test_same_practitioner_same_time_is_rejected', got error of 'FAILED tests/test_regressions.py::test_same_practitioner_same_time_is_rejected - NameError: name 'conflict_setup' is not defined'
 - resolution is I have missed 'conflict_setup' class in test_regressions.py, copy it from test_services.py and re-run the command, test pass.
 
-
 ## H. Refactoring decision and before/after verification (Sophie)
 
 Smell and exact location: 
@@ -361,7 +360,7 @@ Focused and full after-refactor commands / working directory / results / evidenc
 - Focused and full after-refactor commands: python -m pytest tests/test_regressions.py
 - working directory:D:\PycharmProjects\st1-assignment3\project
 - results: 8 passed in 0.07s
-- evidence: 
+- evidence: b6cad496c1961b0732046e4ee62a64596cb175bd
 Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted
 
 ## I. Git, human review and integration
