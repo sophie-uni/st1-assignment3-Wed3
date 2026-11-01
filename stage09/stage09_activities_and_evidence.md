@@ -26,7 +26,7 @@ What is intentionally lost on exit? (Hassan) Every patient, practitioner and app
 Plan before AI. This replaces schema/key design; no database tables are required.
 
 | Function or component | Explicit inputs and types | Outputs | Responsibility and validation | Domain source / existing constraint | Who |
-|---|---|---|---|---|---|
+|---|---|---|---|---|
 | appointment_sort_key | | | | | Trung |
 | select_appointments | `appointments: list[Appointment]`, `practitioner_id: str`, `status: AppointmentStatus \| None = None` | A new `list[Appointment]` containing the same objects, ordered by `appointment_sort_key` | Selects the given practitioner's appointments and, if a status is given, only that status; `None` keeps every status. Does no validation (registration and status type are checked by the service), never changes the source list or objects, and performs no input/output. | `appointment.practitioner.practitioner_id` from the actual linked `Practitioner`; `appointment.status` enum; ordering uses `date_time` and `appointment_id` | Hassan |
 | Service listing (select_appointments) | practitioner_id: str |  appointments: list[Appointment] | Retrieves all appointments associated with the practitioner_id. Validate that practitioner_id is not null, empty, and matches an existing practitioner record. | In data_strore, practitioner must exist and be active | Sophie |
@@ -70,12 +70,11 @@ Query decisions (Hassan):
 | QRY-03 (Hassan) | Unsorted source; A1, A2, A4 share 09:00 | Query ordering through the named key | `A9, A1, A2, A4, A3`; source order and fields unchanged | T-QRY03-1, T-QRY03-2   |
 | FP-01 (Hassan) | Same arguments three times | Query | Equal results in distinct lists; no input/output | T-FP01-1, T-FP01-2     |
 | FP-02 (Hassan) | Empty, already-sorted and unsorted lists | Query | New list each time containing the same unchanged objects | T-FP02-1 to T-FP02-3   |
-| QRY-04-1 Known practitioner with no appointments or no matching status | practitioner_id | find_appointment returns a empty list | New empty list; no error | T-QRY-04-1 |
-| QRY-04-2 Valid unknown practitioner ID | practitioner_id | Validate practitioner existence in data store returns null | LookupError| T-QRY-04-2 |
-| QRY-04-3 Blank or invalid ID | practitioner_id | Validate practitioner_id format, null or invalid | ValueError | T-QRY-04-3 |
-| QRY-04-4 Known practitioner with a non-enum status such as 'scheduled' | practitioner_id | Validate status | ValueError; do not treat it as no matches | T-QRY-04-4 |
-| QRY-04-5 Omitted status | practitioner_id | find_appointment returns a list of appointments | list appointments include every status and preserve history | T-QRY-04-5 |
-| | | | | |
+| QRY-04-1 (Sophie) Known practitioner with no appointments or no matching status | practitioner_id | find_appointment returns a empty list | New empty list; no error | T-QRY-04-1 |
+| QRY-04-2 (Sophie) Valid unknown practitioner ID | practitioner_id | Validate practitioner existence in data store returns null | LookupError| T-QRY-04-2 |
+| QRY-04-3 (Sophie) Blank or invalid ID | practitioner_id | Validate practitioner_id format, null or invalid | ValueError | T-QRY-04-3 |
+| QRY-04-4 (Sophie) Known practitioner with a non-enum status such as 'scheduled' | practitioner_id | Validate status | ValueError; do not treat it as no matches | T-QRY-04-4 |
+| QRY-04-5 (Sophie) Omitted status | practitioner_id | find_appointment returns a list of appointments | list appointments include every status and preserve history | T-QRY-04-5 |
 | | | | | |
 
 Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty versus unknown versus invalid, enum conversion, actual object identity, error handling and unchanged state on rejection: <!-- response -->
@@ -89,11 +88,11 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 | T-QRY03-1, 2 (Hassan) | same | Equal 09:00 times ordered `A1, A2, A4`; A9 first by date; source order and fields unchanged | Passed | same |
 | T-FP01-1, 2 (Hassan) | same | Three calls give identical results in different lists; no printing or input | Passed | same |
 | T-FP02-1 to 3 (Hassan) | same | Empty and already-sorted inputs return a new list; results are the same unchanged objects | Passed | same |
-|T-QRY-04-1 | In test_services.py test_known_practitioner_with_no_matching_appointments() | Existing practitioner with no appointments. Assert result == [] | | |
-|T-QRY-04-2 | In test_services.py test_unknown_practitioner() | Unknown practitioner ID. Assert LookupError is raised. | Pass | |
-|T-QRY-04-3 | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | |
-|T-QRY-04-4 | In test_services.py test_non_enum_status() | Status supplied as "scheduled" string. Assert ValueError is raised. | Pass | |
-|T-QRY-04-5 | In test_services.py test_omitted_status_returns_all() | Status omitted. Assert scheduled and cancelled appointments are both returned. | | |
+| T-QRY-04-1 (Sophie) | In test_services.py test_known_practitioner_with_no_matching_appointments() | Existing practitioner with no appointments. Assert result == [] | Pass | f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
+| T-QRY-04-2 (Sophie) | In test_services.py test_unknown_practitioner() | Unknown practitioner ID. Assert LookupError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
+| T-QRY-04-3 (Sophie) | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
+| T-QRY-04-4 (Sophie) | In test_services.py test_non_enum_status() | Status supplied as "scheduled" string. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
+| T-QRY-04-5 (Sophie) | In test_services.py test_omitted_status_returns_all() | Status omitted. Assert scheduled and cancelled appointments are both returned. | Pass | f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
 | | | | | |
 
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
@@ -162,9 +161,9 @@ Instead, the tests provide evidence that the implementation satisfies the specif
 
 | Scenario / acceptance ID | Reproducible inputs / artefact | Expected result | Observed result and state check | Evidence link |
 |---|---|---|---|---|
-| UI-01 full menu workflow | | | | |
-| UI-02 invalid-input recovery | | | | |
-| Automated service workflow | | | | |
+| UI-01 full menu workflow | `cd project`; `python -m pytest tests/test_workflows.py::test_menu_completes_register_book_cancel_list_and_exit -q` | Register/find participants; book, find, cancel, list/filter; reject a same-practitioner conflict; allow another practitioner and reuse the cancelled slot; exit cleanly. | The test drives those inputs through the real menu. It verifies participant lookup output, conflict error, scheduled and cancelled appointment output, list filtering, successful slot reuse and exit; records remain visible through the session until exit. Result: 1 passed. | `project/tests/test_workflows.py::test_menu_completes_register_book_cancel_list_and_exit` |
+| UI-02 invalid-input recovery | `cd project`; `python -m pytest tests/test_workflows.py::test_menu_recovers_from_invalid_input_without_losing_session -q` | Recover from unknown choices, blank/duplicate IDs, unknown records, malformed/impossible dates, invalid status and repeated cancellation; then accept a valid action and exit. | The test verifies an error is shown for each invalid action, subsequent valid input is processed, and appointment state remains scheduled after rejected operations and cancelled after the first valid cancellation. Result: 1 passed. | `project/tests/test_workflows.py::test_menu_recovers_from_invalid_input_without_losing_session` |
+| Automated service workflow | `cd project`; `python -m pytest tests/test_services.py -q` | Service contracts for registration, lookup, booking/conflicts, cancellation and practitioner appointment listing hold without console input/output. | Result: 27 passed. Service tests check returned/stored object identity and state, exception behavior, slot conflicts/reuse, and ordered/status-filtered listing. | `project/tests/test_services.py` |
 
 Include registration/find, booking, conflict rejection, different-practitioner booking, cancellation, retrieval, listing/filtering, freed slot and exit; duplicate/unknown/blank IDs, malformed/impossible date, invalid status, unknown choice and repeated cancellation. Identify before/after state and subsequent successful action.
 
@@ -190,7 +189,7 @@ Actual response: <!-- accessible reference -->
 
 | AI finding | Code/test evidence | Severity | Accept/Modify/Reject and reason | Change or no change | Actual verification |
 |---|---|---|---|---|---|
-| F-1 | test_known_practitioner_with_no_matching_appointments, test_omitted_status_returns_all | The intended helper is select_appointments in queries.py, but that helper—and its sort-key function—are still unimplemented. | Pending, wait for missing functions completed | No change | |
+| F-1 | test_known_practitioner_with_no_matching_appointments, test_omitted_status_returns_all | The intended helper is select_appointments in queries.py, but that helper—and its sort-key function—are still unimplemented. | Pending, wait for missing functions completed | No change | Fixed by queries.py completed, tests passed in f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
 | | | | | | |
 
 Responsibility check: explain how domain invariants, shared-store collections, service coordination, pure queries and console effects remain separate: (Hassan, query part) The pure query only selects and orders the list it is given. It does not validate, store, print or change anything, so domain rules stay in the domain classes, collections stay in the data store, validation stays in the service, and interaction stays in the console. <!-- others: response -->
