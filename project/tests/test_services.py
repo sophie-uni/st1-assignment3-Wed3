@@ -18,8 +18,6 @@ from smartcare.domain import (
 
 BOOKING_TIME = datetime(2026, 10, 1, 9, 0)
 
-
-
 """Stage06 TODO service tests"""
 def test_find_patient_returns_registered_patient() -> None:
     store = SmartCareDataStore()
@@ -160,12 +158,9 @@ def test_new_appointment_starts_scheduled_by_service() -> None:
     assert appointment.status is AppointmentStatus.SCHEDULED
     assert store.find_appointment("A1") is appointment
 
-
-
 # Hassan: FR-05 Prevent practitioner conflict
 
 CONFLICT_TIME = datetime(2026, 10, 1, 9, 0)
-
 
 def conflict_setup() -> tuple[SmartCareDataStore, AppointmentService]:
     """Create a fresh store with patients P1, P2 and practitioners D1, D2."""
@@ -251,8 +246,6 @@ def test_cancelled_appointment_does_not_block_slot() -> None:
 
 
 # Devam: FR-06 Cancel appointment
-
-
 def cancellation_setup() -> tuple[
     SmartCareDataStore,
     AppointmentService,
@@ -332,3 +325,81 @@ def test_cancel_completed_appointment_through_service_is_rejected() -> None:
 
     assert completed.status is AppointmentStatus.COMPLETED
     assert data_store.find_appointment('A1') is completed
+
+#QRY-04
+def foundation() -> tuple[
+    SmartCareDataStore,
+    Patient,
+    Practitioner,
+    AppointmentService,
+]:
+    """Create fresh registered participants and services for a supplied
+    check.
+    """
+    data_store = SmartCareDataStore()
+    patient = PatientService(data_store).register_patient('P1', 'Alex Example')
+    practitioner = PractitionerService(
+        data_store,
+    ).register_practitioner('D1', 'Taylor Example', 'General')
+    return (data_store, patient, practitioner, AppointmentService(data_store))
+#T-QRY-04-1 Known practitioner with no appointments
+def test_known_practitioner_with_no_matching_appointments():
+    data_store, patient, practitioner, service = foundation()
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert result == []
+
+#T-QRY-04-2 Unknown practitioner
+def test_unknown_practitioner():
+    data_store, patient, practitioner, service = foundation()
+
+    with pytest.raises(LookupError):
+        service.list_practitioner_appointments("D999")
+
+#T-QRY-04-3 Blank or invalid practitioner ID
+@pytest.mark.parametrize("practitioner_id", ["", "   ", None])
+def test_invalid_practitioner_id(practitioner_id):
+    data_store, patient, practitioner, service = foundation()
+
+    with pytest.raises(ValueError):
+        service.list_practitioner_appointments(practitioner_id)
+
+#T-QRY-04-4 Status is not an AppointmentStatus enum
+def test_non_enum_status():
+    data_store, patient, practitioner, service = foundation()
+
+    with pytest.raises(ValueError):
+        service.list_practitioner_appointments(
+            "D1",
+            "scheduled"
+        )
+
+#T-QRY-04-5 Omitted status returns all statuses
+def test_omitted_status_returns_all():
+    data_store, patient, practitioner, service = foundation()
+
+    appt1 = Appointment(
+        "A1",
+        patient,
+        practitioner,
+        BOOKING_TIME,
+        AppointmentStatus.SCHEDULED,
+    )
+
+    appt2 = Appointment(
+        "A2",
+        patient,
+        practitioner,
+        BOOKING_TIME.replace(hour=10),
+        AppointmentStatus.CANCELLED,
+    )
+
+    data_store.add_appointment(appt1)
+    data_store.add_appointment(appt2)
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert len(result) == 2
+    assert appt1 in result
+    assert appt2 in result
