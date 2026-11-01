@@ -10,6 +10,7 @@ from smartcare.domain import (
     Patient,
     Practitioner,
 )
+from smartcare.queries import select_appointments
 
 
 class PatientService:
@@ -189,9 +190,4 @@ class AppointmentService:
             all_appointments, practitioner_id=practitioner_id, status=status
         )
 
-        # Return filtered list, QRY-04-5 (returns [] if no matches found, QRY-04-1 )
-        return (
-            matching_appointments
-            if matching_appointments is not None
-            else []
-        )
+        return matching_appointments

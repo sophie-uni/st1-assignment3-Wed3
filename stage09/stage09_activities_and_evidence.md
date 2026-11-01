@@ -90,9 +90,9 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 | T-FP01-1, 2 (Hassan) | same | Three calls give identical results in different lists; no printing or input | Passed | same |
 | T-FP02-1 to 3 (Hassan) | same | Empty and already-sorted inputs return a new list; results are the same unchanged objects | Passed | same |
 |T-QRY-04-1 | In test_services.py test_known_practitioner_with_no_matching_appointments() | Existing practitioner with no appointments. Assert result == [] | | |
-|T-QRY-04-2 | In test_services.py test_unknown_practitioner() | Unknown practitioner ID. Assert LookupError is raised. | Pass | |
-|T-QRY-04-3 | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | |
-|T-QRY-04-4 | In test_services.py test_non_enum_status() | Status supplied as "scheduled" string. Assert ValueError is raised. | Pass | |
+|T-QRY-04-2 | In test_services.py test_unknown_practitioner() | Unknown practitioner ID. Assert LookupError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
+|T-QRY-04-3 | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
+|T-QRY-04-4 | In test_services.py test_non_enum_status() | Status supplied as "scheduled" string. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
 |T-QRY-04-5 | In test_services.py test_omitted_status_returns_all() | Status omitted. Assert scheduled and cancelled appointments are both returned. | | |
 | | | | | |
 
