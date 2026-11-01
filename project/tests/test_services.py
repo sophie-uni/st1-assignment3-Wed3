@@ -342,6 +342,7 @@ def foundation() -> tuple[
         data_store,
     ).register_practitioner('D1', 'Taylor Example', 'General')
     return (data_store, patient, practitioner, AppointmentService(data_store))
+
 #T-QRY-04-1 Known practitioner with no appointments
 def test_known_practitioner_with_no_matching_appointments():
     data_store, patient, practitioner, service = foundation()
