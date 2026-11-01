@@ -161,4 +161,37 @@ class AppointmentService:
         ValueError; a known practitioner with no matches returns an
         empty list.
         """
-        raise NotImplementedError('Stage 9: practitioner appointments')
+        #raise NotImplementedError('Stage 9: practitioner appointments')
+        # Validate practitioner_id format (QRY-04-3, Blank or invalid ID)
+        if (
+                not isinstance(practitioner_id, str)
+                or not practitioner_id.strip()
+        ):
+            raise ValueError("practitioner_id must be a non-empty string.")
+
+        # Validate status parameter, QRY-04-4
+        if status is not None and not isinstance(status, AppointmentStatus):
+            raise ValueError(
+                "status must be None or an instance of AppointmentStatus."
+            )
+
+        # Validate practitioner existence in data store, QRY-04-2
+        if self.data_store.find_practitioner(practitioner_id) is None:
+            raise LookupError(
+                f"Practitioner with ID '{practitioner_id}' not found."
+            )
+
+        # Fetch all appointments from data store, QRY-04-1 and QRY-04-5
+        all_appointments = self.data_store.list_appointments()
+
+        # Filter appointments using select_appointments helper
+        matching_appointments = select_appointments(
+            all_appointments, practitioner_id=practitioner_id, status=status
+        )
+
+        # Return filtered list, QRY-04-5 (returns [] if no matches found, QRY-04-1 )
+        return (
+            matching_appointments
+            if matching_appointments is not None
+            else []
+        )
