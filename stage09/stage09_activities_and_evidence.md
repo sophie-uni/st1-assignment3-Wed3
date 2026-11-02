@@ -98,7 +98,6 @@ Query decisions (Hassan):
 | QRY-04-3 (Sophie) Blank or invalid ID | practitioner_id | Validate practitioner_id format, null or invalid | ValueError | T-QRY-04-3 |
 | QRY-04-4 (Sophie) Known practitioner with a non-enum status such as 'scheduled' | practitioner_id | Validate status | ValueError; do not treat it as no matches | T-QRY-04-4 |
 | QRY-04-5 (Sophie) Omitted status | practitioner_id | find_appointment returns a list of appointments | list appointments include every status and preserve history | T-QRY-04-5 |
-| | | | | |
 
 Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty versus unknown versus invalid, enum conversion, actual object identity, error handling and unchanged state on rejection: <!-- response -->
 
@@ -117,7 +116,6 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 | T-QRY-04-3 (Sophie) | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
 | T-QRY-04-4 (Sophie) | In test_services.py test_non_enum_status() | Status supplied as "scheduled" string. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
 | T-QRY-04-5 (Sophie) | In test_services.py test_omitted_status_returns_all() | Status omitted. Assert scheduled and cancelled appointments are both returned. | Pass | f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
-| | | | | |
 
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
@@ -207,14 +205,13 @@ Actual response:
 
 The failure is caused by services.py calling select_appointments, which isn’t defined. The intended helper is select_appointments in queries.py, but that helper—and its sort-key function—are still unimplemented. The plan is to implement those helpers, connect the service to them, and run the focused and module tests.
 
-Human design completed before AI: <!-- reference -->
-Actual prompt/context supplied: (Hassan) Context: `project/smartcare/queries.py` (`select_appointments`), `project/smartcare/domain.py` (unchanged contracts), `project/tests/test_queries.py` and the passing test result. Prompt: the Stage 9 handout reviewer prompt, unchanged.
-Actual response: <!-- accessible reference -->
-
 | AI finding | Code/test evidence | Severity | Accept/Modify/Reject and reason | Change or no change | Actual verification |
 |---|---|---|---|---|---|
 | F-1 | test_known_practitioner_with_no_matching_appointments, test_omitted_status_returns_all | The intended helper is select_appointments in queries.py, but that helper—and its sort-key function—are still unimplemented. | Pending, wait for missing functions completed | No change | Fixed by queries.py completed, tests passed in f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
-| | | | | | |
+
+Human design completed before AI: <!-- reference -->
+Actual prompt/context supplied: (Hassan) Context: `project/smartcare/queries.py` (`select_appointments`), `project/smartcare/domain.py` (unchanged contracts), `project/tests/test_queries.py` and the passing test result. Prompt: the Stage 9 handout reviewer prompt, unchanged.
+Actual response: <!-- accessible reference -->
 
 Responsibility check: explain how domain invariants, shared-store collections, service coordination, pure queries and console effects remain separate: (Hassan, query part) The pure query only selects and orders the list it is given. It does not validate, store, print or change anything, so domain rules stay in the domain classes, collections stay in the data store, validation stays in the service, and interaction stays in the console. <!-- others: response -->
 
@@ -255,22 +252,35 @@ This proves it was retained, not deleted, while still no longer blocking a slot.
 
 ## H. Review, completion and common handover
 
-Issues and bounded branches: <!-- links -->
-PR/diff and another-member human reviewer: <!-- actual links/name -->
-Review responses and Copilot comparison: <!-- links -->
-Integrated common Stage 9 SHA: <!-- complete -->
-Full regression command, working directory, actual count/result and evidence: <!-- complete -->
-README run instructions and scope/limitations: <!-- link -->
-Unresolved issues and support/action: <!-- complete -->
-UG common candidate / PG future branch plan: <!-- complete -->
+Issues and bounded branches:
+- stage09/servicelisting (Sophie)
+- stage09/console (Sophie)
+- stage09-1 (Hassan)
+- stage09/Trung (Trung)
+PR/diff and another-member human reviewer: 
+- https://github.com/sophie-uni/st1-assignment3-Wed3/pull/42
+- https://github.com/sophie-uni/st1-assignment3-Wed3/pull/43
+- https://github.com/sophie-uni/st1-assignment3-Wed3/pull/44
+- https://github.com/sophie-uni/st1-assignment3-Wed3/pull/45
+Review responses and Copilot comparison: Not available
+Integrated common Stage 9 SHA: ced2f62b415ca3e98764835214380c6081841f4f
+Full regression command, working directory, actual count/result and evidence: 
+- regression command: 'python -m pytest tests/test_queries.py', 'python -m pytest tests/test_workflows.py', 'python -m pytest tests/test_services.py'
+- working directory: project\tests\
+- tests\test_queries.py: 15 passed in 0.08s
+- tests\test_workflows.py: 2 passed in 0.08s
+- tests\test_services.py: 27 passed in 0.10s
+README run instructions and scope/limitations: 'python main.py --interactive'
+Unresolved issues and support/action: Not available
+UG common candidate / PG future branch plan: -> stage10 -> stage11
 
-- [ ] Query contracts, purity, new lists and named-key ordering verified.
-- [ ] Service empty/unknown/invalid cases and cancellation history verified.
-- [ ] Every console command and invalid-input recovery demonstrated.
-- [ ] Query and workflow tests plus all previous tests pass; actual evidence linked.
-- [ ] Human design, Copilot critique, review and integration recorded honestly.
-- [ ] Reflections and ten formative responses completed.
-- [ ] README updated; earlier code/tests/records preserved.
-- [ ] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
+- [✔] Query contracts, purity, new lists and named-key ordering verified.
+- [✔] Service empty/unknown/invalid cases and cancellation history verified.
+- [✔] Every console command and invalid-input recovery demonstrated.
+- [✔] Query and workflow tests plus all previous tests pass; actual evidence linked.
+- [✔] Human design, Copilot critique, review and integration recorded honestly.
+- [✔] Reflections and ten formative responses completed.
+- [✔] README updated; earlier code/tests/records preserved.
+- [✔] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
 
 No persistence, rescheduling or assurance implementation is part of Stage 9. UG: 6→7→8→9→12. PG: 6→7→8→9→10→11→12. Mixed groups keep one repository and protect the common candidate.
