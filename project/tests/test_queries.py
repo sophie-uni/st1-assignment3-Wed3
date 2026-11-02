@@ -215,3 +215,17 @@ def test_fp02_unsorted_source_reuses_same_unchanged_objects() -> None:
     for appointment in result:
         assert any(appointment is original for original in source)
     assert snapshot(source) == before
+
+
+def test_fp03_returns_new_list_with_same_object_references() -> None:
+    """T-FP03-1: the query returns a fresh list but reuses the same objects."""
+    source = build_source()
+    before = snapshot(source)
+
+    result = select_appointments(source, 'D1')
+
+    assert result is not source
+    assert ids(result) == ['A9', 'A1', 'A2', 'A4', 'A3']
+    for appointment in result:
+        assert any(appointment is original for original in source)
+    assert snapshot(source) == before
