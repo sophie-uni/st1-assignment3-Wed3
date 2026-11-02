@@ -16,8 +16,8 @@ Stage 8 integrated SHA, command, working directory and actual result: 399e222d74
 | Practitioner specialty | Required session/domain state | A validated `Practitioner` field set at registration and shown whenever the practitioner or their appointments are displayed. | Hassan |
 | Patient identity | Domain state | Patient details are persistent data that must be stored and available across multiple visits and sessions. | Sophie |
 | Appointment history | Domain state | Appointment records are part of the patient's long-term medical and administrative history and need to be retained for future reference, reporting, and continuity of care. | Sophie |
-| Debug print output | | | Trung |
-| Appointment status | | | Trung |
+| Debug print output | Transient interaction state | Diagnostic output is only for the current run and should never be persisted or treated as domain state. It exists to support debugging, not to change the model. | Trung |
+| Appointment status | Domain state | Appointment status is a core business datum: scheduled, cancelled, completed, etc. It determines validity, filtering, and whether a record blocks a slot. It must be retained as part of the appointment’s history and used in validation logic. | Trung |
 
 What is intentionally lost on exit? (Hassan) Every patient, practitioner and appointment, including cancelled history. All records live in one in-memory `SmartCareDataStore` created when the program starts, so a new launch begins empty. Restart persistence (FR-10) is retired, so this is the declared scope rather than a defect.
 
@@ -26,11 +26,11 @@ What is intentionally lost on exit? (Hassan) Every patient, practitioner and app
 Plan before AI. This replaces schema/key design; no database tables are required.
 
 | Function or component | Explicit inputs and types | Outputs | Responsibility and validation | Domain source / existing constraint | Who |
-|---|---|---|---|---|
-| appointment_sort_key | | | | | Trung |
-| select_appointments | `appointments: list[Appointment]`, `practitioner_id: str`, `status: AppointmentStatus \| None = None` | A new `list[Appointment]` containing the same objects, ordered by `appointment_sort_key` | Selects the given practitioner's appointments and, if a status is given, only that status; `None` keeps every status. Does no validation (registration and status type are checked by the service), never changes the source list or objects, and performs no input/output. | `appointment.practitioner.practitioner_id` from the actual linked `Practitioner`; `appointment.status` enum; ordering uses `date_time` and `appointment_id` | Hassan |
-| Service listing (select_appointments) | practitioner_id: str |  appointments: list[Appointment] | Retrieves all appointments associated with the practitioner_id. Validate that practitioner_id is not null, empty, and matches an existing practitioner record. | In data_strore, practitioner must exist and be active | Sophie |
-| Console (run_menu)| User menu selection: str; user-entered data (patient ID, name, appointment ID, practitioner ID, date/time): str | Displayed menus, prompts, error messages, confirmation messages | Presents the application menu; collects and validates user input; calls domain/service functions such as register, find, book, cancel and list; handles expected input errors; and keeps the session running until exit is selected. Validate menu choices and ensure required fields are not empty before calling services. | Uses data maintained by the patient and appointment services. Must only accept valid menu options such as register, find, book, cancel, list and exit, also comply with business rules enforced by the domain layer. | Sophie |
+|---|---|---|---|---|---|
+| appointment_sort_key | appointment: Appointment | tuple[datetime, str] | Produces a stable sort key so appointments are ordered consistently for display and filtering. It must use date/time, then appointment id. | Domain ordering is based on appointment date/time and id; this is a pure helper and should not mutate state. | Trung |
+| select_appointments | `appointments: list[Appointment]`, `practitioner_id: str`, `status: AppointmentStatus` &#124; `None = None` | A new `list[Appointment]` containing the same objects, ordered by `appointment_sort_key` | Selects the given practitioner's appointments and, if a status is given, only that status; `None` keeps every status. Does no validation (registration and status type are checked by the service), never changes the source list or objects, and performs no input/output. | `appointment.practitioner.practitioner_id` from the actual linked `Practitioner`; `appointment.status` enum; ordering uses `date_time` and `appointment_id` | Hassan |
+| Service listing (select_appointments) | `practitioner_id: str` | `appointments: list[Appointment]` | Retrieves all appointments associated with the practitioner_id. Validate that practitioner_id is not null, empty, and matches an existing practitioner record. | In data_store, practitioner must exist and be active | Sophie |
+| Console (run_menu) | User menu selection: `str`; user-entered data (patient ID, name, appointment ID, practitioner ID, date/time): `str` | Displayed menus, prompts, error messages, confirmation messages | Presents the application menu; collects and validates user input; calls domain/service functions such as register, find, book, cancel and list; handles expected input errors; and keeps the session running until exit is selected. Validate menu choices and ensure required fields are not empty before calling services. | Uses data maintained by the patient and appointment services. Must only accept valid menu options such as register, find, book, cancel, list and exit, also comply with business rules enforced by the domain layer. | Sophie ||
 
 Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actual participants/date_time/status to the existing contracts: (Hassan) `Patient(patient_id, name)` and `Practitioner(practitioner_id, name, specialty)` trim and require every field, their IDs are read-only properties, and the store rejects duplicate IDs. `Appointment` holds the actual registered `Patient` and `Practitioner` objects (the store checks this with `is`), a validated naive minute-precision `date_time`, and an `AppointmentStatus` that only `cancel()` changes. `select_appointments` filters on the linked practitioner's `practitioner_id` and on the `status` enum, and orders on `date_time` then `appointment_id`. It reads these existing fields only and adds none. Names and specialty are not used by the query; the console reads them from the same linked objects when displaying results.
 
@@ -38,7 +38,7 @@ Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actua
 
 | Conceptual case | Violation | Correct boundary and reason | Who |
 |---|---|---|---|
-| Appointment.cancel reads input | | | Trung |
+| Appointment.cancel reads input | The domain method should not read user input or prompt the user. It should only perform the state transition for the appointment itself. | The domain object should only validate and update its own state; input parsing and prompting belong to the console or service layer. This keeps the model reusable and testable without a keyboard or menu. | Trung |
 | Service prints/reads the menu | The service would own input and presentation, so it could not be reused or tested without a keyboard, and the caller could not decide how to handle errors. | The console owns the menu loop, prompts and messages. The service only coordinates the store and domain objects, returning objects or raising `ValueError`/`LookupError` for the console to report. | Hassan |
 | Query sorts its source in place | A query should not modify the data it receives. Calling appointments.sort changes the caller's list and creates an unintended side effect. | The query operation should work on a copy of the data and return the result. Queries are responsible for retrieving or filtering data, not mutating domain state. | Sophie |
 | Store prints Appointment saved | The store is performing user interface work. Printing messages mixes persistence responsibilities with presentation responsibilities. | The store should save and return the Appointment object or a result value. The Console/UI layer is responsible for displaying messages such as "Appointment saved". This keeps persistence and presentation concerns separated. | Sophie |
@@ -47,7 +47,29 @@ Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actua
 
 For `appointments.sort(key=appointment_sort_key)` and `result = sorted(appointments, key=appointment_sort_key)`, predict source order, return value and result identity. Give a meaningful mutation check: <!-- response -->
 
-Score-example prediction and explanation of passing the named key: <!-- response -->
+Score-example prediction and explanation of passing the named key:
+- For an appointments.sort(key=appointment_sort_key) and result = sorted(appointments, key=appointment_sort_key), predict source order, return value and result identity. Give a meaningful mutation check:
+  - appointments = [a3, a1, a2] 
+    original = appointments.copy()
+
+    appointments.sort(key=appointment_sort_key)
+
+        # Source list is mutated in place 
+        # appointments now contains the reordered list
+        # original remains unchanged because it was a copy before the sort
+
+    result = sorted(appointments, key=appointment_sort_key)
+        # result is a new list
+        # appointments is still in the sorted order
+        # result is not the same object as appointments
+        # result == appointments
+        # result is not appointments
+- Expected behaviour:
+  - sort() mutates the original list in place and returns None.
+  - sorted() does not mutate the original list; it returns a new list.
+  - appointment_sort_key must be a pure function based on the appointment’s date/time and id.
+  - The key function must not mutate the appointment object or depend on console state, user input, or the current menu context.
+- This is the correct boundary: sorting is a query/presentation concern, not a domain mutation. The domain model remains unchanged; only a new ordered collection is created when needed.
 
 ### A5 Exit question (Hassan)
 
@@ -70,6 +92,7 @@ Query decisions (Hassan):
 | QRY-03 (Hassan) | Unsorted source; A1, A2, A4 share 09:00 | Query ordering through the named key | `A9, A1, A2, A4, A3`; source order and fields unchanged | T-QRY03-1, T-QRY03-2   |
 | FP-01 (Hassan) | Same arguments three times | Query | Equal results in distinct lists; no input/output | T-FP01-1, T-FP01-2     |
 | FP-02 (Hassan) | Empty, already-sorted and unsorted lists | Query | New list each time containing the same unchanged objects | T-FP02-1 to T-FP02-3   |
+| FP-03 (Trung) | Valid source list, practitioner_id, optional status | `select_appointments(source, practitioner_id, status)` in the pure query helper; no validation, no hidden state, no I/O | New list only; same object references preserved; source list and objects unchanged | T-FP03-1  |
 | QRY-04-1 (Sophie) Known practitioner with no appointments or no matching status | practitioner_id | find_appointment returns a empty list | New empty list; no error | T-QRY-04-1 |
 | QRY-04-2 (Sophie) Valid unknown practitioner ID | practitioner_id | Validate practitioner existence in data store returns null | LookupError| T-QRY-04-2 |
 | QRY-04-3 (Sophie) Blank or invalid ID | practitioner_id | Validate practitioner_id format, null or invalid | ValueError | T-QRY-04-3 |
@@ -88,6 +111,7 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 | T-QRY03-1, 2 (Hassan) | same | Equal 09:00 times ordered `A1, A2, A4`; A9 first by date; source order and fields unchanged | Passed | same |
 | T-FP01-1, 2 (Hassan) | same | Three calls give identical results in different lists; no printing or input | Passed | same |
 | T-FP02-1 to 3 (Hassan) | same | Empty and already-sorted inputs return a new list; results are the same unchanged objects | Passed | same |
+| T-FP03-1 (Trung) | same | The pure helper works on supplied valid objects and filter values; it does not establish whether a practitioner is registered. That validation belongs in service listing. Do not modify any source object or collection. A new container may contain the same object references. Do not use a hidden global store or perform input/output. | Passed | same |
 | T-QRY-04-1 (Sophie) | In test_services.py test_known_practitioner_with_no_matching_appointments() | Existing practitioner with no appointments. Assert result == [] | Pass | f9739fce2046cd0a4a9ca5fd9dc1897521cdada9 |
 | T-QRY-04-2 (Sophie) | In test_services.py test_unknown_practitioner() | Unknown practitioner ID. Assert LookupError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
 | T-QRY-04-3 (Sophie) | In test_services.py test_invalid_practitioner_id(practitioner_id) | Blank, whitespace, or None ID. Assert ValueError is raised. | Pass | 76d25fa7ba6b8ba8ebfc58fe13901af6eb6648a1 |
@@ -196,9 +220,15 @@ Responsibility check: explain how domain invariants, shared-store collections, s
 
 ## F. Required reflections
 
-1. Which integration concern was architectural rather than a filtering/sorting detail? (Hassan) Where validation lives. The pure query cannot tell an unknown practitioner from a registered one with no appointments, because both give `[]`. If validation were left out, `'D9'` would quietly return an empty list. So the service must check registration and status type first, then pass the registered ID to the query. This keeps the query pure while still giving the user the right error.
-2. Which Copilot suggestion did you reject as over-engineering, and why? <!-- response -->
-3. How did you prove cancelled appointments remain retrievable and listable in the same session? <!-- response -->
+1. Which integration concern was architectural rather than a filtering/sorting detail? (Trung)
+Where validation lives. The pure query cannot tell an unknown practitioner from a registered one with no appointments, because both give `[]`. If validation were left out, `'D9'` would quietly return an empty list. So the service must check registration and status type first, then pass the registered ID to the query. This keeps the query pure while still giving the user the right error.
+2. Which Copilot suggestion did you reject as over-engineering, and why? (Trung)
+Any suggestion that added hidden state, validation, or printing into select_appointments. That would make the query depend on external state and violate purity, reuse, and the stage contract.
+3. How did you prove cancelled appointments remain retrievable and listable in the same session? (Trung)
+After cancellation, the same appointment object is still found by ID and keeps status == CANCELLED.
+Listing without a status filter still includes it.
+Listing with SCHEDULED only excludes it.
+This proves it was retained, not deleted, while still no longer blocking a slot.
 
 ## G. Ten formative answers (Hassan)
 
