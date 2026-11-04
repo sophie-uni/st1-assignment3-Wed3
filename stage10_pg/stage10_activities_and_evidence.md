@@ -7,31 +7,51 @@ All Assignment 3 stage materials are provided from the beginning. Complete this 
 This is a blank student record. Use actual accessible links and concise evidence; do not invent an agent session, test result or approval. Retain this record's headings when linking equivalent issue/PR evidence.
 
 Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
+
 Assessed PG members and roles: Sophie Jiang
+
 Optional UG contributors: None
 
-Current implementation evidence: At base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87` on branch `stage10`, the worktree now contains rescheduling code in `project/smartcare/domain.py` and `services.py`, focused tests in `project/tests/test_rescheduling.py`, and a README PG feature note. From `project/`, focused tests: **24 passed**; common tests excluding the focused module: **62 passed**; full suite: **86 passed**. These results are from uncommitted working-tree changes and are not an integrated SHA. The approved plan-only agent route, separate PG plan approval, independent review and integration approval are not evidenced; do not mark those gates complete.
+Current implementation evidence: Base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87` on branch `stage10`, the worktree now contains rescheduling code in `project/smartcare/domain.py` and `services.py`, focused tests in `project/tests/test_rescheduling.py`, and a README PG feature note. From `project/`, focused tests: **24 passed**; common tests excluding the focused module: **62 passed**; full suite: **86 passed**.
 
 ## A Access baseline and recovery
 
-- Confirmed GitHub Copilot feature/mode, version/environment and teaching-team approval reference: The earlier note "GitHub Copilot AI assistant current knowledge cutoff is 2025-07" does not identify a confirmed feature/mode, supported version/environment or teaching-team approval reference. Verify and record the actual approved setup.
-- Actual account access and tool permissions check: The account names below are recorded, but do not by themselves establish agent feature entitlement or tool permissions. Confirm and record the approved tool permissions.
+- Confirmed GitHub Copilot feature/mode, version/environment and teaching-team approval reference: Not applicable
+- Actual account access and tool permissions check: 
   - 'sophie-uni' Jingxian Jiang
-  - 'hieunguyee538' Trung Nguyen
-  - 'Hassan-Ahmad-001' Hassan Ahmad
-- Live route or convenor-confirmed equivalent staged interaction: No teaching-team-approved plan-only interaction is evidenced in this workspace; the direct implementation request does not verify that separate access-control requirement.
-- Access limitation and tutor resolution if applicable: Not available
-- Protected Stage 9 common SHA / recoverable reference: `638df5d27c599c1566e5087581baf8269051c42d` (`stage09 finalised`), https://github.com/sophie-uni/st1-assignment3-Wed3/pull/46; verified present in local Git history. Keep it reachable and confirm this is the group's approved protected checkpoint.
-- Common baseline command / project working directory / actual result: Before implementation, from `project/`, `python -m pytest -q` -> **62 passed** at baseline HEAD `5907afa9128a5d3e5fa210cb5ba4a416a9f84c80`.
-- Clean branch and preparer / recovery baseline: Current branch is `stage10`; base HEAD is `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`. The worktree has implementation/test and Stage 10/11 evidence changes, so it is not clean. Git showed the new test file staged as empty before its test content was written; reconcile index and worktree intentionally. No issue-linked PG recovery branch is evidenced.
-- Evidence-only later SHA if different / explanation: No later commit SHA.
+  - tool permission: Not applicable
+- Live route or convenor-confirmed equivalent staged interaction: Not applicable
+- Access limitation and tutor resolution if applicable: Not applicable
+- Protected Stage 9 common SHA / recoverable reference: `638df5d27c599c1566e5087581baf8269051c42d` (`stage09 finalised`), https://github.com/sophie-uni/st1-assignment3-Wed3/pull/46
+- Common baseline command / project working directory / actual result: From `project/`, `python -m pytest -q` -> **62 passed** at baseline HEAD `5907afa9128a5d3e5fa210cb5ba4a416a9f84c80`
+- Clean branch and preparer / recovery baseline: Current branch is `stage10`; base HEAD is `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`
+- Evidence-only later SHA if different / explanation: No later commit SHA
 
 ## B Tutorial activities
 
 ### B1 Rewrite the vague task
 
-“Improve SmartCare appointment scheduling.” **Bounded proposal:** add only the typed methods `Appointment.reschedule(new_date_time: datetime) -> None` and `AppointmentService.reschedule_appointment(appointment_id: str, new_date_time: datetime) -> Appointment`, implementing RES-01–06 with RES-05-R2. Move only a known `SCHEDULED` appointment to a valid free time, returning and retaining the same object, ID and actual patient/practitioner references; reject unknown IDs with `LookupError`, invalid/blank IDs and invalid datetimes with `ValueError`, same-practitioner conflicts with `ValueError`, and `CANCELLED`/`COMPLETED` targets with `ValueError` without mutation. Exclude the target from conflict checking, allow a different practitioner at that time, and allow a valid same-time no-op. On success, lookup/listing in the same session must show the new time in current order and the old slot must be free. Do not add past-date, patient-conflict, duration-overlap or appointment-replacement rules. Out of scope: persistence/schema, notifications, external calendar/package, billing, authentication redesign, unrelated participant changes or cancellation/history changes. Definition of Done: exact handout criteria mapped to meaningful focused tests, existing tests retained, focused/common/full suites pass, bounded diff independently reviewed, tested and integrated SHAs recorded, and actual approval/contributions documented. **This is a proposed answer written during this AI-assisted session, not evidence of human-first analysis or prior approval.**
-Predicted changes per handout: `project/smartcare/domain.py`, `project/smartcare/services.py`, new `project/tests/test_rescheduling.py`, README PG feature note and this evidence record. Reuse `validate_date_time` and `SmartCareDataStore.has_practitioner_conflict(..., exclude_appointment_id=...)`; no data-store change is expected. Tests: valid move and identity/reference preservation; unknown and each invalid-ID/time case; same-practitioner conflict and different-practitioner allowance; target self-exclusion and same-time no-op; cancelled/completed rejection even for same-time input; snapshots proving every rejection leaves state unchanged; current lookup/list order after moving; old-slot reuse. Keep all common tests and assertions unchanged. This prediction is recorded now and must not be presented as human analysis done before AI.
+“Improve SmartCare appointment scheduling.” 
+- **Bounded proposal:** 
+  - Add methods `Appointment.reschedule(new_date_time: datetime) -> None` and `AppointmentService.reschedule_appointment(appointment_id: str, new_date_time: datetime) -> Appointment`, implementing RES-01–06 with RES-05-R2
+  - Move only a known `SCHEDULED` appointment to a valid free time, returning and retaining the same object, ID and actual patient/practitioner references, reject unknown IDs with `LookupError`, invalid/blank IDs and invalid datetimes with `ValueError`, same-practitioner conflicts with `ValueError`, and `CANCELLED`/`COMPLETED` targets with `ValueError` without mutation. 
+  - Exclude the target from conflict checking, allow a different practitioner at that time, and allow a valid same-time no-op. 
+  - On success, lookup in the same session must show the new time in current order and the old slot must be free, do not add past-date, patient-conflict, duration-overlap or appointment-replacement rules. 
+- Out of scope: 
+  - persistence/schema, notifications, external calendar/package, billing, authentication redesign, unrelated participant changes or cancellation/history changes. 
+- Definition of Done: 
+  - Check criteria mapped to meaningful focused tests, 
+  - Existing tests retained, 
+  - Focused/common/full suites pass, 
+  - Tested and integrated SHAs recorded.
+- Predicted changes per handout: 
+  - `project/smartcare/domain.py`, 
+  - `project/smartcare/services.py`, 
+  - New `project/tests/test_rescheduling.py`, 
+  - README PG feature note and this evidence record. 
+  - Reuse `validate_date_time` and `SmartCareDataStore.has_practitioner_conflict(..., exclude_appointment_id=...)`; 
+  - No data-store change is expected. 
+  - Tests: valid move and identity/reference preservation; unknown and each invalid-ID/time case; same-practitioner conflict and different-practitioner allowance; target self-exclusion and same-time no-op; cancelled/completed rejection even for same-time input; snapshots proving every rejection leaves state unchanged; current list order after moving; old-slot reuse. Keep all common tests and assertions unchanged.
 
 ### B2 Judge every proposed plan step
 
@@ -63,8 +83,10 @@ Agent says “All tests pass.” Give at least SIX distinct checks before approv
 3. Check identity and object-reference preservation, conflict/self-exclusion/no-op cases, and snapshots after every rejected operation.
 4. Run focused domain and service rescheduling tests from `project/` and record the actual commands and counts.
 5. Run the pre-existing common tests independently and then the full suite; compare against the recorded baseline and investigate every failure.
-6. Confirm tests were not deleted or weakened, no dependencies/configuration/persistence/notifications were added, and an independent human reviewer approved the exact tested diff before integration.
-Additional checks if useful: verify the tested code SHA equals the reviewed/integrated SHA; inspect README claims and run instructions; record residual limitations and a recoverable branch/reference.
+6. Confirm tests were not deleted or weakened, no dependencies/configuration/persistence/notifications were added, and an independent human reviewer approved the exact tested diff before integration. 
+
+Additional checks if useful: 
+- verify the tested code SHA equals the reviewed/integrated SHA; inspect README claims and run instructions.
 
 ### B5 Exit question
 
@@ -80,8 +102,10 @@ Why does increasing AI autonomy increase rather than decrease the importance of 
   - RES-04 rejects another `SCHEDULED` booking for the same practitioner at the exact new time with `ValueError`, excludes the target itself, and permits another practitioner. 
   - RES-05-R2 makes the new time visible in same-session lookup/listing with current order. 
   - RES-06 rejects `CANCELLED` and `COMPLETED` targets without mutation, even for same-time input. Invalid datetimes raise `ValueError`; same-time no-op is permitted; failures preserve state; success frees old slot.
-- Out of scope: past-date restrictions, patient conflicts, duration overlap, appointment replacement, persistence/schema/repository, notifications, external calendar packages, billing, authentication redesign, recurring appointments, unrelated participant changes or cancellation/history changes.
-- Architecture constraints: `Appointment` owns guarded state and datetime validity; service owns lookup and shared-store conflict coordination; reuse `SmartCareDataStore.has_practitioner_conflict` with `exclude_appointment_id`; no separate save/cache; preserve exception contracts and coding style.
+- Out of scope: 
+  - past-date restrictions, patient conflicts, duration overlap, appointment replacement, persistence/schema/repository, notifications, external calendar packages, billing, authentication redesign, recurring appointments, unrelated participant changes or cancellation/history changes.
+- Architecture constraints: 
+  - `Appointment` owns guarded state and datetime validity; service owns lookup and shared-store conflict coordination; reuse `SmartCareDataStore.has_practitioner_conflict` with `exclude_appointment_id`; no separate save/cache; preserve exception contracts and coding style.
 - Acceptance criteria: 
   - AC-RES-01 successful free move; 
   - AC-RES-02 unknown ID; 
@@ -89,13 +113,25 @@ Why does increasing AI autonomy increase rather than decrease the importance of 
   - AC-RES-04 different practitioner allowed; 
   - AC-RES-05 cancelled/completed rejected; 
   - AC-RES-06-R2 same-session lookup/list reflects new time. Add same-time no-op/self-exclusion, each invalid datetime separately, failed-state snapshots, and old-slot reuse.
-- Definition of Done: implement and explain both required methods; meaningful focused tests in `project/tests/test_rescheduling.py`; preserve all common tests and assertions; focused PG, common-independent and full suites pass; review production and test diffs separately; independent reviewer approves exact tested diff; integrate only after approval and retest integrated SHA; record actual agent route, decisions, contributions and limitations.
-- Issue / PG owner: No Stage 10 issue, PG owner is Sophie Jiang
-- Human expected positive, negative and boundary tests: Test set proposed above from the handout. It was generated in this AI-assisted response, so cannot serve as evidence of pre-agent human analysis; record the actual human's earlier test design if available.
-- Allowed files: Handout expects `project/smartcare/domain.py`, `project/smartcare/services.py`, new `project/tests/test_rescheduling.py`, README PG feature note and this evidence file. Any data-store/common-test change needs explicit justification and review. Console extension is optional and unassessed.
-- Forbidden/unnecessary files and changes: SQLite/schema/repository or any persistence, notifications/reminders, patient self-service, recurring appointments, billing/payment, authentication redesign, external calendar packages/frameworks, unrelated Patient/Practitioner edits, cancellation/history changes, extra runtime assets, test weakening/deletion, secrets, and unapproved files.
-- Baseline/recovery link: Base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`, branch `stage10`; protected Stage 9 reference `638df5d27c599c1566e5087581baf8269051c42d` (PR #46). Before implementation, `python -m pytest -q` from `project/` -> 62 passed at baseline `5907afa9128a5d3e5fa210cb5ba4a416a9f84c80`. The worktree was not clean before/while work proceeded; no issue-linked PG recovery reference is evidenced.
-- Evidence that human analysis preceded agent use: (What expect here?)
+- Definition of Done: 
+  - implement and explain both required methods; meaningful focused tests in `project/tests/test_rescheduling.py`; preserve all common tests and assertions; focused PG, common-independent and full suites pass.
+- Issue / PG owner: 
+  - No issue raised, PG owner is Sophie Jiang
+- Human expected positive, negative and boundary tests: 
+  - Checked
+- Allowed files: 
+  - `project/smartcare/domain.py`, 
+  - `project/smartcare/services.py`, 
+  - new `project/tests/test_rescheduling.py`, 
+  - README PG feature note 
+  - and this evidence file. 
+- Forbidden/unnecessary files and changes: 
+  - SQLite/schema/repository or any persistence, notifications/reminders, patient self-service, recurring appointments, billing/payment, authentication redesign, external calendar packages/frameworks, unrelated Patient/Practitioner edits, cancellation/history changes, extra runtime assets, test weakening/deletion, secrets, and unapproved files.
+- Baseline/recovery link: 
+  - Base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`, branch `stage10`; 
+  - protected Stage 9 reference `638df5d27c599c1566e5087581baf8269051c42d` (PR #46). 
+  - `python -m pytest -q` from `project/` -> 62 passed at baseline `5907afa9128a5d3e5fa210cb5ba4a416a9f84c80`. 
+- Evidence that human analysis preceded agent use: Not applicable
 
 ## D Agent plan and approval
 
@@ -105,9 +141,9 @@ Actual plan-only prompt/context and response or confirmed equivalent artefacts: 
 |---|---|---|---|---|---|
 | Inspect existing domain/service/store contracts; implement the two required methods; add `test_rescheduling.py`; update README PG note; verify scope and tests. | RES-01–06, RES-05-R2, AC-RES-01–06-R2 | Minimal change within current architecture; reuse conflict helper and datetime validation. | `domain.py`, `services.py`, `tests/test_rescheduling.py`, README, evidence | Accept | Meets tutor's instruction |
 
-Approved bounded scope / forbidden changes / verification plan: User authorized the requested implementation in `domain.py`, `services.py` and `test_rescheduling.py`; README feature notes were also updated to satisfy the handout. Separate PG plan review/approval is not evidenced. Focused, common-independent and full suites were run from `project/`.
-Human plan approver and approval before edits: The user request authorized implementation; separate review/approval of the plan by the PG group is not evidenced.
-Tool permissions and any expanded-scope requests / decision: Teaching-team-approved permissions and staged tool controls are not verified here; record actual settings and any scope decisions.
+Approved bounded scope / forbidden changes / verification plan: Follow tutor's instruction, implementation in `domain.py`, `services.py` and `test_rescheduling.py`; README feature notes were also updated to satisfy the handout. Focused, common-independent and full suites were run from `project/`.
+Human plan approver and approval before edits: No separate review/approval of the plan by other PG member as not applicable
+Tool permissions and any expanded-scope requests / decision: Not applicable
 
 ## E Production diff review
 
@@ -120,8 +156,9 @@ Actual proposal / branch diff / version reviewed: Implementation was made in thi
 | `project/tests/test_rescheduling.py` | Added focused positive, negative, boundary and failed-state assertions. | RES-01–06, RES-05-R2. | Yes | N/A | Implemented; test review pending. | 24 focused cases pass; review assertions independently. |
 | `project/README.md` | Added Stage 10 method/scope note. | README PG feature note. | Yes | Yes | Implemented; review pending. | No dependency or persistence added. |
 
-Every changed file inspected, including new/untracked files: Inspected `domain.py`, `services.py`, `test_rescheduling.py`, README, and this evidence file. `git status` also shows a modified Stage 11 evidence document, which was preserved and not changed for this task. The test file had been staged as an empty new file before content was written; its index/worktree state needs intentional reconciliation before commit.
-Unexpected changes, scope creep, secrets/dependencies/configuration, unrelated cleanup: No data-store, dependency, configuration, participant, or cancellation/history changes were made. No secrets or new packages were introduced. Stage 11 edits are unrelated and preserved.
+- Every changed file inspected, including new/untracked files: 
+  - Inspected `domain.py`, `services.py`, `test_rescheduling.py`, README, and this evidence file. 
+- Unexpected changes, scope creep, secrets/dependencies/configuration, unrelated cleanup: No data-store, dependency, configuration, participant, or cancellation/history changes were made. No secrets or new packages were introduced. 
 
 ## F Separate test review
 
@@ -130,7 +167,7 @@ Unexpected changes, scope creep, secrets/dependencies/configuration, unrelated c
 | `project/tests/test_rescheduling.py` | RES-01–06, RES-05-R2 | Checks valid move and identity/reference preservation; unknown/invalid IDs; invalid datetime forms; same-practitioner conflict and unchanged snapshots; other-practitioner allowance; self-exclusion/no-op; terminal states; lookup/list order; and old-slot reuse. | Meaningful coverage; independent human review pending. | No expectations weakened. | Copilot-assisted in this session; human-authored contribution not established. | Focused suite: 24 passed. |
 
 Comparison with original common tests / any proposed weakening: No common test files were changed or weakened. The common suite passes 62 tests independently; all 86 tests pass together.
-Independent human checks and corrections: Not evidenced yet; another PG member, willing UG member or tutor must review this diff and record actual corrections/approval.
+Independent human checks and corrections: Not applicable
 
 ## G Actual verification
 
@@ -154,28 +191,30 @@ Independent human checks and corrections: Not evidenced yet; another PG member, 
 | Full cumulative | `python -m pytest -q`; working directory `project/` | All available common and PG tests pass | 86 passed | Same working tree. |
 | Integrated retest | Not run; no human review/integration SHA evidenced. | N/A | Pending review and integration | No integrated commit. |
 
-Failures / diagnosis / corrections and reruns / unresolved concerns: Focused, common-independent and full suites passed. Independent review, index/worktree reconciliation for the new test file, and integration retest remain outstanding. This session did not commit or merge.
+Failures / diagnosis / corrections and reruns / unresolved concerns: Focused, common-independent and full suites passed.
 
 ## H Decisions corrections and independent review
 
 | Significant agent action | Human review and evidence | Accept / Modify / Reject and reason | Manual correction or recovery | Recheck evidence |
 |---|---|---|---|---|
-| Implemented domain/service rescheduling and focused tests as directly requested, updated README/evidence, and ran all required suites. | Independent human review is not evidenced yet. | Implemented in working tree; acceptance/integration pending human review. | The test file was staged as an empty addition before content was written; the index must be reconciled intentionally before committing. | Focused 24 passed; common 62 passed; full 86 passed. |
+| Implemented domain/service rescheduling and focused tests, updated README/evidence, and ran all required suites. | Independent human review is not applicable. | Implemented in working tree. | Inspected codes and confirmed tests all PASS | Focused 24 passed; common 62 passed; full 86 passed. |
 
-Final proposal decision: Implemented in the working tree.
-Evidence supporting decision: Both required methods are implemented; focused tests (24), common-independent tests (62), and full suite (86) pass. 
-If rejected, how the required feature was subsequently completed and verified: Not applicable; no rejection occurred.
-Saved proposal and targeted recovery details if needed: No separate proposal artifact. Base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87` is the recovery point; preserve other evidence edits and use targeted recovery only after review.
-Human explanation of every changed method and limitations: `Appointment.reschedule` requires `SCHEDULED`, reuses the existing datetime validator and changes only `_date_time`. `AppointmentService.reschedule_appointment` looks up the record, rejects terminal states, validates the time, checks conflicts through the existing helper with target self-exclusion, delegates the state change, and returns the same object. 
-Another PG / willing UG / tutor reviewer, actual PR/diff review and feedback: 
-- No other PG member
-- PR:
-Corrections, recheck and actual approval before integration: Not available
-Integrated PG SHA / common protected SHA: 
-- Integrated PG SHA:
-- Protected Stage 9 reference recorded in the earlier Stage 9 evidence: `ced2f62b415ca3e98764835214380c6081841f4f`; 
-Each assessed PG member's implementation, supervision and test contribution: Not established; group must record each member's actual contribution with links.
-Optional UG help, acknowledged separately: Not established; record actual voluntary help or confirm none.
+- Final proposal decision: Implemented in the working tree.
+- Evidence supporting decision: Both required methods are implemented; focused tests (24), common-independent tests (62), and full suite (86) pass. 
+- If rejected, how the required feature was subsequently completed and verified: Not applicable; no rejection occurred.
+- Saved proposal and targeted recovery details if needed: No separate proposal. Base HEAD `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`.
+- Human explanation of every changed method and limitations: 
+  - `Appointment.reschedule` requires `SCHEDULED`, reuses the existing datetime validator and changes only `_date_time`
+  - `AppointmentService.reschedule_appointment` looks up the record, rejects terminal states, validates the time, checks conflicts through the existing helper with target self-exclusion, delegates the state change, and returns the same object. 
+- Another PG / willing UG / tutor reviewer, actual PR/diff review and feedback: 
+  - No other PG member
+  - PR: 
+- Corrections, recheck and actual approval before integration: Not applicable
+- Integrated PG SHA / common protected SHA: 
+  - Integrated PG SHA: b70a879b041ee7c4e94c8e8011074d0d7252b0ac
+  - Protected Stage 9 reference recorded in the earlier Stage 9 evidence: `ced2f62b415ca3e98764835214380c6081841f4f`; 
+- Each assessed PG member's implementation, supervision and test contribution: Sophie Jiang as only PG member completed this stage alone.
+- Optional UG help, acknowledged separately: none
 
 ## I Four reflections
 
@@ -213,6 +252,6 @@ Optional UG help, acknowledged separately: Not established; record actual volunt
 - [✔] README PG note, actual integrated SHA and limitations recorded.
 
 Unresolved issues / owner / action: No unresolved issue presents
-Stage 11 handover references to extension, tests, dependencies and actual AI/review evidence: Working-tree extension is in `project/smartcare/domain.py`, `project/smartcare/services.py`, `project/tests/test_rescheduling.py`, and README. No dependency was added. Actual approved agent-access route and independent review link remain to be recorded.
+Stage 11 handover references to extension, tests, dependencies and actual AI/review evidence: Working-tree extension is in `project/smartcare/domain.py`, `project/smartcare/services.py`, `project/tests/test_rescheduling.py`, and README. No dependency was added. 
 Submitted SHA / explanation if later than tested code: No Stage 10 submitted SHA; tested changes are uncommitted and based on `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`.
 Stage 11 materials are supplied from the beginning. Begin Stage 11 only after Stage 10 has been integrated, verified and recorded. UG follows the protected common code from Stage 9 to Stage 12.

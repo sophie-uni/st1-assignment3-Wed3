@@ -136,6 +136,7 @@ class Appointment:
             raise ValueError('Only SCHEDULED appointments may be cancelled')
         self._status = AppointmentStatus.CANCELLED
 
+    #Stage10
     def reschedule(self, new_date_time: datetime) -> None:
         """Move a SCHEDULED appointment to a valid local date/time.
 
