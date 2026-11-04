@@ -9,6 +9,7 @@ from smartcare.domain import (
     AppointmentStatus,
     Patient,
     Practitioner,
+    validate_date_time,
 )
 from smartcare.queries import select_appointments
 
@@ -178,9 +179,7 @@ class AppointmentService:
 
         # Validate practitioner existence in data store, QRY-04-2
         if self.data_store.find_practitioner(practitioner_id) is None:
-            raise LookupError(
-                f"Practitioner with ID '{practitioner_id}' not found."
-            )
+            raise LookupError('Practitioner not found')
 
         # Fetch all appointments from data store, QRY-04-1 and QRY-04-5
         all_appointments = self.data_store.list_appointments()
@@ -191,3 +190,35 @@ class AppointmentService:
         )
 
         return matching_appointments
+
+    #stage 10
+    def reschedule_appointment(
+        self,
+        appointment_id: str,
+        new_date_time: datetime,
+    ) -> Appointment:
+        """Reschedule a stored SCHEDULED appointment and return that object.
+
+        Unknown IDs raise LookupError; invalid IDs, datetimes, transitions
+        and practitioner conflicts raise ValueError without changing state.
+        """
+        appointment = self.data_store.find_appointment(appointment_id)
+        if appointment is None:
+            raise LookupError('Appointment not found')
+        if appointment.status is not AppointmentStatus.SCHEDULED:
+            raise ValueError(
+                'Only SCHEDULED appointments may be rescheduled',
+            )
+
+        validated_date_time = validate_date_time(new_date_time)
+        if self.data_store.has_practitioner_conflict(
+            appointment.practitioner.practitioner_id,
+            validated_date_time,
+            exclude_appointment_id=appointment.appointment_id,
+        ):
+            raise ValueError(
+                'Practitioner already has a SCHEDULED appointment at this time',
+            )
+
+        appointment.reschedule(validated_date_time)
+        return appointment
