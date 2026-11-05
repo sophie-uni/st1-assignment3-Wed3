@@ -208,10 +208,10 @@ Failures / diagnosis / corrections and reruns / unresolved concerns: Focused, co
   - `AppointmentService.reschedule_appointment` looks up the record, rejects terminal states, validates the time, checks conflicts through the existing helper with target self-exclusion, delegates the state change, and returns the same object. 
 - Another PG / willing UG / tutor reviewer, actual PR/diff review and feedback: 
   - No other PG member
-  - PR: 
+  - PR: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/48
 - Corrections, recheck and actual approval before integration: Not applicable
 - Integrated PG SHA / common protected SHA: 
-  - Integrated PG SHA: b70a879b041ee7c4e94c8e8011074d0d7252b0ac
+  - Integrated PG SHA: 95c518c577fc2db8fad5a5b99e00483b7d44f04e
   - Protected Stage 9 reference recorded in the earlier Stage 9 evidence: `ced2f62b415ca3e98764835214380c6081841f4f`; 
 - Each assessed PG member's implementation, supervision and test contribution: Sophie Jiang as only PG member completed this stage alone.
 - Optional UG help, acknowledged separately: none
@@ -246,12 +246,12 @@ Failures / diagnosis / corrections and reruns / unresolved concerns: Focused, co
 - [✔] Plan reviewed before bounded actions; every file and test diff inspected.
 - [✔] Actual agent route, decisions, corrections and rechecks recorded honestly.
 - [✔] No unrelated features, persistence, dependencies or staff solutions introduced.
-- [ ] Another-member or tutor review and integrated retest complete.
+- [ Not applicable ] Another-member or tutor review and integrated retest complete.
 - [✔] Tutorial, four reflections, ten formative responses and PG contributions complete.
 - [✔] Each PG member can explain their code and supervision.
 - [✔] README PG note, actual integrated SHA and limitations recorded.
 
 Unresolved issues / owner / action: No unresolved issue presents
-Stage 11 handover references to extension, tests, dependencies and actual AI/review evidence: Working-tree extension is in `project/smartcare/domain.py`, `project/smartcare/services.py`, `project/tests/test_rescheduling.py`, and README. No dependency was added. 
-Submitted SHA / explanation if later than tested code: No Stage 10 submitted SHA; tested changes are uncommitted and based on `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`.
+Stage 11 handover references to extension, tests, dependencies and actual AI/review evidence: in `project/smartcare/domain.py`, `project/smartcare/services.py`, `project/tests/test_rescheduling.py`, and README. No dependency was added. 
+Submitted SHA / explanation if later than tested code:tested changes are uncommitted and based on `2194e70d6c62eed7beb0dae78af1bf85f7e63e87`.
 Stage 11 materials are supplied from the beginning. Begin Stage 11 only after Stage 10 has been integrated, verified and recorded. UG follows the protected common code from Stage 9 to Stage 12.
