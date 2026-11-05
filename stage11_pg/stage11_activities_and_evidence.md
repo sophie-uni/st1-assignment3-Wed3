@@ -225,7 +225,7 @@ No false/rejected suggestion, if applicable: Not applicable
 
 - Human reviewer / PR or diff link / feedback: 
   - Human reviewer: Sophie Jiang 
-  - PR:
+  - PR: https://github.com/sophie-uni/st1-assignment3-Wed3/pull/51
 - Corrections and recheck / approval before integration: 
   - The error-output correction and test expectation were reviewed in the current worktree; the pre-fix test failed and post-fix suites pass.
 - Overall decision: 
@@ -241,7 +241,7 @@ No false/rejected suggestion, if applicable: Not applicable
 - Accountable reviewer and PG member sign-off: 
   - Not available
 - Integrated PG SHA / protected common SHA: 
-  - Integrated PG SHA:
+  - Integrated PG SHA: `eb7b155b126bac16e447530940bee3b54ae9c685`
   - Protected Stage 9 common SHA remains `638df5d27c599c1566e5087581baf8269051c42d
 
 ## J Reflections
@@ -293,7 +293,7 @@ No false/rejected suggestion, if applicable: Not applicable
 
 Unresolved issues / owner / handover action: No test failures remain. 
 Tested code SHA / command / working directory / observed result: 
-- Tested code SHA:
+- Tested code SHA: `eb7b155b126bac16e447530940bee3b54ae9c685`
 - Command: From `project/`: assurance `python -m pytest -q tests/test_assurance.py` → 3 passed; previous PG `python -m pytest -q --ignore=tests/test_assurance.py` → 86 passed; common `python -m pytest -q --ignore=tests/test_assurance.py --ignore=tests/test_rescheduling.py` → 62 passed; full `python -m pytest -q` → 89 passed.
 Final submitted SHA / later evidence-only change explanation: 
 Stage 12 handover links to same project/tests/assurance conclusion and limitations: 
