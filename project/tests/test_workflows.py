@@ -94,7 +94,8 @@ def test_menu_recovers_from_invalid_input_without_losing_session(
     assert 'Patient ID cannot be blank' in output
     assert 'Patient ID already exists' in output
     assert 'Patient not found' in output
-    assert "Practitioner with ID 'D999' not found." in output
+    assert 'Practitioner not found' in output
+    assert 'D999' not in output
     assert 'Use date/time format YYYY-MM-DD HH:MM' in output
     assert 'Invalid calendar date/time' in output
     assert 'Appointment ID already exists' in output
