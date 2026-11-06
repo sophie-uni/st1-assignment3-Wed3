@@ -213,10 +213,10 @@ Common decision / PG decision where different: Common stage 6 to stage 9 and sta
 
 Exact common tested SHA: Stage 9 common SHA `638df5d27c599c1566e5087581baf8269051c42d`
 Exact PG tested SHA or not applicable: 'Stage10' and 'Stage11' SHAs `95c518c577fc2db8fad5a5b99e00483b7d44f04e` and `eb7b155b126bac16e447530940bee3b54ae9c685`
-Final submitted SHA / repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
+Final submitted SHA / repository URL: Final submitted SHA: `5960a6271295c10b05c4c1ef70c922b2288d9ce6`, https://github.com/sophie-uni/st1-assignment3-Wed3
 Evidence-only later commit and difference explanation: Not applicable
 Executable changes after testing and re-verification: Not applicable
-Source ZIP name / SHA correspondence / extracted comparison: st1-assignment3
+Source ZIP name / SHA correspondence / extracted comparison: SmartCare-release.zip
 
 
 ## L Submission package verification
