@@ -3,17 +3,18 @@
 BLANK student response template. Supplied from the beginning in stage12/ in your EXISTING repository; complete it only when you reach Stage 12 after the previous applicable stage is integrated, verified and recorded; preserve project/, tests, earlier records and Git history. UG/common and PG/extended scope must be explicit. Use concise results and versioned links, not copied logs or source. No staff answers or fabricated approvals.
 
 Group/tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
+
 Members and UG/PG applicability: Sophie Jiang (PG), Hassan Ahmad (UG), Trung Hieu (UG)
 
 
 ## A Release scope and starting SHA
 
 Release label/version and requirements baseline: SmartCare A3 2026 revision 2. Python 3.13 and pytest 8.3.5 verified.
-Common starting SHA / branch / applicable members: [response]
-PG starting SHA / branch / applicable members or not applicable: [response]
-Working-state review and approved integration: [response]
-Protected common candidate and PG differences: [response]
-Feature freeze / owner / verifier: [response]
+Common starting SHA / branch / applicable members: Stage 9 common SHA `638df5d27c599c1566e5087581baf8269051c42d`
+PG starting SHA / branch / applicable members or not applicable: PG adds branch 'Stage10' and 'Stage11', SHAs `95c518c577fc2db8fad5a5b99e00483b7d44f04e` and `eb7b155b126bac16e447530940bee3b54ae9c685`
+Working-state review and approved integration: Stage 12 has only 'stage12_activities_and_evidence.md' changes
+Protected common candidate and PG differences: Protected Stage 9 common SHA is `638df5d27c599c1566e5087581baf8269051c42`. PG adds Stage 10 rescheduling and Stage 11 assurance work.
+Feature freeze / owner / verifier: Freeze optional feature work. Sophie Jiang is release owner. Hassan and Trung reviewed.
 
 
 ## B Requirements and release readiness matrix
@@ -137,20 +138,43 @@ Use actual prompt: Review Smartcare\ project
 
 ## G Known limitations debt and release notes
 
-Delivered features: [response]
-Important fixes: [response]
-Architecture/quality improvements: [response]
-Known limitations: [response]
-AI-assisted development note: [response]
+- Delivered features: 
+  - Common scope supports patient/practitioner registration and lookup, appointment booking with exact practitioner/time conflict checks, cancellation with retained history, appointment lookup, and practitioner listing/filtering. 
+  - The PG extension adds service-level rescheduling.
+- Important fixes:
+  - Rescheduling preserves appointment and participant identity, rejects invalid or conflicting changes without mutation, and frees the previous slot. 
+  - Removed caller-supplied practitioner IDs from unknown-practitioner errors. 
+  - Moved previously nested domain tests to module scope.
+- Architecture/quality improvements: 
+  - Responsibilities are separated across domain entities, the in-memory store, services, pure appointment queries, and console interaction. 
+  - Tests cover filtering, ordering, fresh result lists, rescheduling, store isolation, and combined workflows.
+- Known limitations: 
+  - Data is synthetic and session-only; there is no persistence, authentication, external calendar, or production/clinical certification. 
+  - Times are local, naive, and minute-precision; duration, patient-conflict, past-date, and timezone rules are not implemented. 
+  - Concurrency, operations/monitoring, and accessibility/usability are not established.
+- AI-assisted development note: 
+  - Copilot assisted with code and review suggestions. 
+  - The record describes human checks against requirements and tests, including remediation of the error-message finding. 
+  - Treat AI output as a suggestion, not approval.
+  - Course AI-policy confirmation and some provenance evidence remain limitations.
 
 | Debt item | Impact | Priority | Future action | Accepted? / release rationale |
 |---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] |
-Session-only synthetic data and minute-precision local time: [response]
-Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: [response]
-Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: [response]
-Difference between accepted scope limit and unresolved required behaviour: [response]
-PG assurance residual risks / owner / status or not applicable: [response]
+| Session-only in-memory records | Data is lost when the process exits; unsuitable for durable records. | Low for the declared teaching scope; blocker for real deployment. | Add persistence only if future requirements require it, with privacy, access-control, and recovery design. | Accepted for the course scope; limitation is disclosed. |
+| No explicit timezone, duration, patient-conflict, or past-date policy | Scheduling checks only the specified practitioner/exact-time rule. | Medium | Confirm requirements first; implement and test only approved rules. | Out of scope; no additional rule is assumed.|
+| Release assurance/provenance follow-up | Course-policy approval, dependency provenance, and independent verification of the final application | High | Confirm policy/dependency details | Not a product feature |
+
+- Session-only synthetic data and minute-precision local time: 
+  - Deliberate scope limits; data disappears at exit and accepted times are naive local datetimes at minute precision.
+- Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: 
+  - Not included; do not use this coursework prototype for real patient or clinical workflows.
+- Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: 
+  - Not verified or specified; further requirements and evaluation would be needed before expanding beyond the teaching demonstration.
+- Difference between accepted scope limit and unresolved required behaviour: 
+  - The documented session-only and scheduling-policy exclusions are intentional scope limits.
+- PG assurance residual risks / owner / status or not applicable: 
+  - Sophie Jiang (PG owner) close the recorded assurance. 
+  - The tests support the stated synthetic, in-memory behaviors but do not establish clinical/security certification.
 
 
 ## H Release findings and corrective action
@@ -177,10 +201,10 @@ Named substantive contributions: [response]
 
 ## J Human release decision
 
-Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: [response]
+Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: READY FOR COURSE RELEASE
 Approver / date / rationale and evidence: [response]
-What risks remain / conditions / owners: [response]
-Can the team explain the system: [response]
+What risks remain / conditions / owners:
+Can the team explain the system: Yes
 Can a change be recovered: [response]
 Common decision / PG decision where different: [response]
 
