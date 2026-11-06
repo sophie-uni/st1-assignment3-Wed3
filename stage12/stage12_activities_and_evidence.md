@@ -18,7 +18,8 @@ Feature freeze / owner / verifier: [response]
 
 ## B Requirements and release readiness matrix
 
-Tutorial activity 1: All tests pass, README setup is incomplete, one dependency is unreviewed and a known limitation is undocumented. Decide Release / Release with conditions / Do not release and justify: [response]
+Tutorial activity 1: All tests pass, README setup is incomplete, one dependency is unreviewed and a known limitation is undocumented. Decide Release / Release with conditions / Do not release and justify: 
+- run `python -m pytest`, 89 passed in 0.26s 
 
 Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptance IDs, evidence and reviewer; distinguish common/PG applicability.
 
@@ -26,16 +27,16 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 |---|---|---|---|---|---|---|
 | Cancellation history works | [response] | [response] | [response] | [response] | [response] | Trung |
 | Architecture responsibilities are appropriate | [response] | [response] | [response] | [response] | [response] | Trung |
-| Rescheduling is safe — PG only | [response] | [response] | [response] | [response] | [response] | Sophie |
-| AI use is responsible — common recheck / PG assurance | [response] | [response] | [response] | [response] | [response] | Sophie |
+| Rescheduling is safe — PG only | Stage 10 records that rescheduling preserves appointment identity and participants, changes the time only for eligible scheduled appointments, and rejects invalid, terminal-state, and conflicting changes. Focused 24, common 62, and full 86 tests passed. | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/48, SHA `95c518c577fc2db8fad5a5b99e00483b7d44f04e` | Sophie Jiang; no other PG reviewer | Partial: behavior and test evidence are recorded, but independent review was not applicable. | Obtain independent review. Scope remains synthetic and in-memory. This is not clinical or concurrency assurance.  | Sophie |
+| AI use is responsible — common recheck / PG assurance | Stage 11 records the identifier-echo correction and assurance tests; 3 assurance tests, 86 previous-PG tests, 62 common tests, and 89 cumulative tests passed. | https://github.com/sophie-uni/st1-assignment3-Wed3/pull/51, SHA `eb7b155b126bac16e447530940bee3b54ae9c685` | Sophie Jiang; no other PG reviewer | Partial: only tests and correction are documented | Confirm the approved AI-use route and dependency provenance; record any missing prompt/version provenance and an independent review. | Sophie |
 | System is maintainable | Layered package with one responsibility per module (domain, data_store, services, queries, console); 93 automated tests after correction; code review in E found two missing docstrings, seven stale ones, small layout issues and seven test cases that never ran. Behaviour-preserving corrections made and the full suite rerun. | [project/smartcare](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/smartcare), [project/tests](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests) at 53a31b5; corrections on branch `stage12/hassan-review` on base 53a31b5 (commit SHA: [record after push]); E and H of this record | Hassan (review); Trung for commented-out code; Sophie for merge | Partly. Sufficient for a course release once the corrections are merged. Maintainability is a review judgement; passing tests do not prove it. | Merge H-1 and H-3 corrections. Trung to decide on remaining commented-out code (`data_store.find_appointment`, `services.py` `#raise` lines, `#Stage10`/`#stage 10` markers) and the unreachable `except NotImplementedError` in `main.py`. | Hassan |
 | FR-01–03 register/find and validation | T-FR01-1 `test_register_patient_stores_valid_patient` (AC-01.1), T-FR01-2 `test_register_patient_rejects_duplicate_id` (AC-01.2), `test_blank_patient_id_rejected_by_service`, `test_find_patient_returns_registered_patient` and `test_find_patient_raises_for_unknown_id` (FR-02), `test_find_practitioner_returns_registered_practitioner`, `test_find_practitioner_raises_for_unknown_id`, `test_duplicate_patient_preserves_original`, `test_duplicate_practitioner_preserves_original`, `test_required_fields` (FR-03). Focused run: 10 passed. Console path covered by UI-02 and the D demonstration. | [test_services.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests/test_services.py), [test_starter.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests/test_starter.py) at 53a31b5 | Hassan; second reviewer Trung | Yes. Assertions check the stored object identity (`is`), `LookupError` for unknown IDs, `ValueError` for blank or duplicate IDs, and that a rejected duplicate leaves the original record unchanged. | No gap for the revision 2 scope. Search by patient name (raised in the Stage 6 user story) is not a revision 2 requirement, so it is out of scope, not a defect. | Hassan |
 | FR-04–05 booking/conflict rules | T-FR04-D1 `test_new_appointment_starts_scheduled`, T-FR04-D2 `test_appointment_rejects_time_not_local_minute_precision` (4 cases), `test_new_appointment_starts_scheduled_by_service`, `test_registration_and_booking`, `test_duplicate_appointment_preserves_original`, `test_unregistered_participants_rejected`; T-FR05-1 (AC-04.1), T-FR05-2 (AC-04.2), T-FR05-3 (one minute either side allowed), T-FR05-4 (cancelled slot free) and their copies in `test_regressions.py`. Focused run after correction: 23 passed. | [test_domain.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests/test_domain.py), [test_services.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests/test_services.py), [test_regressions.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/tests/test_regressions.py) at 53a31b5; T-FR04-D tests running only on branch `stage12/hassan-review` on base 53a31b5 (commit SHA: [record after push]) | Hassan (author of T-FR04-D and T-FR05 tests); independent reviewer Sophie | Yes after correction. Before it, T-FR04-D1/D2 were recorded as passing in Stage 7 but were never collected, and on the common candidate 5907afa removing the minute-precision check still left all 62 tests green. | Fixed by H-1: the same mutation now fails two T-FR04-D2 cases. Merge H-1 into both the common and integrated candidates. Stage 7 text is kept as history and corrected by this record. | Hassan |
 | FR-06–08 cancellation/history/find | [response] | [response] | [response] | [response] | [response] | Trung |
-| FR-09 and QRY/FP listing/filter/order/purity | [response] | [response] | [response] | [response] | [response] | Sophie |
-| UI full console sequence and error recovery | [response] | [response] | [response] | [response] | [response] | Sophie |
+| FR-09 and QRY/FP listing/filter/order/purity | Stage 9 records QRY-01–04 and FP-01–03 checks for practitioner/status filtering, deterministic ordering, empty and unknown cases, fresh result lists, and input/object non-mutation. Stage 11 records a 62-test common recheck. | 'stage09_activities_and_evidence.md', SHA `ced2f62b415ca3e98764835214380c6081841f4f` | Sophie Jiang | Partial: prior coverage is documented, but this Stage 12 row has no final test results yet. | Run and link the common suite against the release SHA in this stage 12 | Sophie |
+| UI full console sequence and error recovery | The Stage 12 demonstration records registration/find, booking, invalid date, conflict, cancellation, repeated/unknown/blank cancellation, recovery, and exit. It links automated workflow tests UI-01/UI-02. | `stage12_activities_and_evidence.md` | Sophie Jiang | [response] | [response] | Sophie |
 | Session-only scope / FR-10 retired | `SmartCareDataStore` holds three dictionaries only; a search of `main.py` and `smartcare/` finds no `sqlite`, `open(`, `json`, `pickle`, `csv`, `os` or ABC use. The demo prints "Session-only data: records are lost on exit." and menu exit prints "Exiting. Session-only data will be lost." A new process started after registering P1 reports "Patient not found" for P1. | [data_store.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/smartcare/data_store.py), [console.py](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/smartcare/console.py), [project/README.md](https://github.com/sophie-uni/st1-assignment3-Wed3/blob/53a31b5/project/README.md) at 53a31b5 | Hassan; second reviewer Trung | Yes. The behaviour and the README both state the session-only scope, so lost data on exit is the declared scope, not a defect. | No code change. The `project/README.md` heading still reads "SmartCare Stage 6 starter"; the README owner should update the title and add the release label. | Hassan |
-| PG RES and assurance integration | [response] | [response] | [response] | [response] | [response] | Sophie|
+| PG RES and assurance integration | Stage 11 records 3 assurance tests, the PG selection, common selection, and full suite passing (89 total) on its tested SHA; Stage 10 records the rescheduling integration. | `https://github.com/sophie-uni/st1-assignment3-Wed3/pull/48`, `https://github.com/sophie-uni/st1-assignment3-Wed3/pull/51`, SHA `eb7b155b126bac16e447530940bee3b54ae9c685` | Sophie Jiang; no other PG reviewer | Yes: integration and tests are recorded for that SHA. | No more action required. | Sophie|
 
 
 ## C Full regression results
@@ -43,9 +44,9 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 | Suite/scope | Environment/version | Working directory and command | Tested SHA | Actual result | Evidence link | Who | 
 |---|---|---|---|---|---|---|
 | Complete common | [response] | [response] | [response] | [response] | [response] | Trung |
-| Complete PG if applicable | [response] | [response] | [response] | [response] | [response] | Sophie |
+| Complete PG if applicable | Python 3.13.18, pytest 8.3.5 | From project/: python -m pytest -q | `eb7b155b126bac16e447530940bee3b54ae9c685` | 89 passed; Stage 11 records 3 assurance, 86 previous-PG, and 62 common tests passing. | Stage 11 test record | Sophie |
 | Affected focused checks after correction | Python 3.13.18, pytest 8.3.5 from the pinned `requirements-dev.txt`, new virtual environment, fresh clone (Linux) | `cd project`; `python -m pytest -q tests/test_domain.py tests/test_workflows.py tests/test_services.py`; then `python -m pytest -q` | Before: 53a31b5fc3aaeb4e3d0ac62bc675fab77523b119. After: branch `stage12/hassan-review` on base 53a31b5 (commit SHA: [record after push]) | Before: full suite 1 failed, 85 passed (`test_menu_recovers_from_invalid_input_without_losing_session`); `test_domain.py` collected 2 tests. After: focused 38 passed (`test_domain.py` collects 9); full suite 93 passed, 0 failed. Mutation check (remove the seconds/microsecond rule): two T-FR04-D2 cases now fail. | H-1, H-2 and H-3 below; PR link: [add after push] | Hassan |
-| Full integrated recheck | [response] | [response] | [response] | [response] | [response] | Sophie |
+| Full integrated recheck | Python 3.13.18, pytest 8.3.5 | From project/: python -m pytest -q | [response] | [response] | [response] | Sophie |
 
 Prior assertions preserved / reviewed test diff (Hassan): The only test file changed is `tests/test_domain.py`. `git diff -w` shows 4 insertions and 2 deletions, all blank lines: every `assert`, parametrised value and docstring is unchanged. The four nested test functions and their helper were moved to module level so pytest collects them; collected tests rose from 86 to 93 (1 + 4 parametrised + 1 + 1). No test was deleted, weakened or rewritten. The workflow failure (H-2) was corrected in `services.py`, not by editing the assertion, so `test_workflows.py` is unchanged. All other test files are unchanged (`git diff --stat`). 
 Remaining failure / limitation (Trung): [response]
@@ -68,12 +69,17 @@ Remaining failure / limitation (Trung): [response]
 | Session-only limitation and normal exit | [response] | [response] | [response] | [response] | Trung |
 | One meaningful requirement-linked pytest test explained | [response] | [response] | [response] | [response] | Trung |
 | Architecture and one actual AI decision / known limitation | [response] | [response] | [response] | [response] | Trung |
-| PG reschedule identity/participants/time and no-op | [response] | [response] | [response] | [response] | Sophie |
-| PG conflict/invalid status/failure non-mutation | [response] | [response] | [response] | [response] | Sophie |
-| PG old slot / current lookup/list ordering / assurance risks | [response] | [response] | [response] | [response] | Sophie |
-Stable demo owner / fresh process / command: (Sophie)[response]
-PG demonstrations through service/tests or not applicable: (Sophie)[response]
+| PG reschedule identity/participants/time and no-op | In-memory store; reschedule scheduled `A1` from 09:00 to 10:00, then request its existing time. | Return and retain the same appointment and participant objects; update only the time. A valid same-time request succeeds without changing state. | Tests passed | In `tests/test_rescheduling.py`: `test_service_moves_same_stored_object_and_listing_uses_new_time` and `test_same_time_noop_excludes_target_from_conflict_check` | Sophie |
+| PG conflict/invalid status/failure non-mutation | Reschedule `A1` into a time already occupied by the same practitioner; try invalid datetime values and `CANCELLED`/`COMPLETED` targets. | Reject conflicts and invalid/terminal requests; preserve all stored appointments and fields after failure. | Tests passed | In `tests/test_rescheduling.py`: `test_same_practitioner_conflict_is_rejected_without_mutation`, `test_service_rejects_invalid_datetime_without_mutating_store` and `test_service_rejects_terminal_target_even_for_same_time`  | Sophie |
+| PG old slot / current lookup/list ordering / assurance risks | Move `A1` from 09:00 to 10:00, book `A2` into the freed 09:00 slot, then list D1’s appointments; also test cancellation/history and a separate store with the same patient ID. | Old slot is reusable; lookup returns the same updated object; lists reflect current time order and are fresh; cancellation retains history; one store’s lookup does not leak another store’s records. | Tests passed | In `tests/test_rescheduling.py`: `test_successful_move_releases_old_slot`, In `tests/test_assurance.py`: `test_reschedule_cancel_history_and_listing_use_fresh_results`, `test_patient_lookup_is_limited_to_its_shared_store` and `test_unknown_practitioner_error_does_not_echo_input` | Sophie |
 
+- Stable demo owner / fresh process / command: (Sophie)
+  - Stable demo owner: Sophie Jiang
+  - fresh process: from project/
+  - command: python main.py --interactive
+- PG demonstrations through service/tests or not applicable: (Sophie)
+  - Rescheduling is service-level, not a console menu action; 
+  - PG feature demo separately with command: python -m pytest -q tests/test_rescheduling.py tests/test_assurance.py tests/test_workflows.py
 
 ## E Final code quality and AI review
 
@@ -87,32 +93,46 @@ PG demonstrations through service/tests or not applicable: (Sophie)[response]
 | Globals / leakage / unnecessary inheritance or frameworks | [response] | [response] | [response] | Trung |
 | No SQLite/persistence/repository ABCs/speculative features | [response] | [response] | [response] | Trung |
 | Synthetic data / secrets / dependencies / provenance | [response] | [response] | [response] | Trung |
-| Significant common Copilot contributions and human verification | [response] | [response] | [response] | Sophie |
-| PG plan/diff/test approvals and Stage 11 VERIFY/TRUST | [response] | [response] | [response] | Sophie |
+| Significant common Copilot contributions and human verification | `project/smartcare/queries.py`, `project/tests/test_queries.py`, `test_services.py`, and `test_workflows.py` | Copilot helped implement appointment filtering/order helpers after the human-defined QRY requirements and tests exposed missing functions. The record describes the query as pure; focused query, service, and workflow tests passed. | Implemented the helpers and connected the service; recorded results: queries 15 passed, workflows 2 passed, services 27 passed. | Sophie |
+| PG plan/diff/test approvals and Stage 11 VERIFY/TRUST | `project/smartcare/domain.py`, `services.py`, and `tests/test_rescheduling.py` | Stage 10 records a bounded RES plan and inspected diff; its focused 24, common 62, and full 86 tests passed; Stage 11 VERIFY/TRUST records test and architecture checks and identifies an observed error-message data-minimisation issue. | Stage 11 changed the unknown-practitioner error to a generic message and added assertions; 3 assurance, 86 previous-PG, 62 common, and 89 cumulative tests passed on the recorded tested code. | Sophie |
+
+Use actual prompt: Review Smartcare\ project
 
 | AI claim | Affected requirement/code | Human check | Accept/Modify/Reject and reason | Actual outcome/action or no change |
 |---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] |
-Access route or approved equivalent / limitations: [response]
-Available AI evidence and missing evidence honestly disclosed: [response]
+| Medium | `project/tests/test_domain.py:74–132`, Several test functions are nested inside `test_repeated_cancellation_is_rejected_and_state_remains_cancelled` | Yes, the functions after `test_repeated_cancellation_is_rejected_and_state_remains_cancelled` position wrong, they should not belong to the function.| Accept | Move the nested tests to module scope, then rerun collection and the full suite. |
+| Low | `project/main.py:11–23`; `project/README.md:1`, the interactive menu is incomplete and the project is a Stage 6 starter, although the menu is implemented. | Yes, information is missing | Accept | Update the descriptions to reflect the current project |
+
+- Access route or approved equivalent / limitations: 
+  - Reviewed `project/` at local HEAD `6e646c8315a4254f6880c59dcb65cea906d5056d`. 
+  - The full suite passes (89 tests), but it misses domain tests that appear to be present in the file.
+  - After move test functions in `tests/test_domain.py`, run python -m pytest, got result: 96 passed in 0.26s
+- Available AI evidence and missing evidence honestly disclosed: 
+  - Used Github Copilot in Pycharm as Agent mode to check
 
 
 ## F README and reproducibility check
 
 | README item | Location | Verifier | Result/gap |
 |---|---|---|---|
-| Purpose and included common/PG scope | [response] | [response] | [response] |
-| Out-of-scope capabilities and known limitations | [response] | [response] | [response] |
-| Confirmed teaching Python version and dependency installation | [response] | [response] | [response] |
-| Working directory / demo / interactive / test commands | [response] | [response] | [response] |
-| Repository structure and architecture responsibilities | [response] | [response] | [response] |
-| Responsible AI summary / synthetic-data rule | [response] | [response] | [response] |
-| Release label/version and SHA links | [response] | [response] | [response] |
-Root README index and project/README verified: [response]
-Fresh clone or extracted ZIP / candidate identity: [response]
-Verifier and clean environment / actual version: [response]
-Setup/run/test commands and observed results: [response]
-Missing local file or setup gap / remedy and recheck: [response]
+| Purpose and included common/PG scope | `project/README.md:15–19`, root `README.md:24–30` | Sophie Jiang | Purpose and common/PG stage scope are described. The project README title still calls this a “Stage 6 starter.” |
+| Out-of-scope capabilities and known limitations | `project/README.md:15,19,21` | Sophie Jiang | States session-only synthetic data; no persistence, notifications, external calendar, patient-conflict, duration, or past-date rules. |
+| Confirmed teaching Python version and dependency installation | `project/README.md:3,13`, `project/requirements-dev.txt` | Sophie Jiang | README specifies Python 3.13 / pytest 8.3.5 and the install command. Local environment is Python 3.13.15 and pytest 8.3.5. |
+| Working directory / demo / interactive / test commands | `project/README.md:5–13`; commands run from `project/` | Sophie Jiang | `python main.py` ran and printed the demo booking. `python -m pytest` passed 96 tests. `python main.py --interactive` opened the menu and handled EOF, but the piped `9` smoke input was not accepted as a valid choice; workflow tests cover menu sequences. |
+| Repository structure and architecture responsibilities | `project/README.md:17,19` | Sophie Jiang | Describes domain, store, services, and rescheduling but responsibilities for `queries.py`, `console.py`, and `main.py` are not fully explained. |
+| Responsible AI summary / synthetic-data rule | Root `README.md:30,56`; `project/README.md:15` | Sophie Jiang | Synthetic-data rule and Copilot verification are mentioned in the root README. |
+| Release label/version and SHA links | Root `README.md:11–14`; `project/README.md:1–3` | Sophie Jiang | [response] |
+
+- Root README index and project/README verified: [response]
+- Fresh clone or extracted ZIP / candidate identity: [response]
+- Verifier and clean environment / actual version: [response]
+- Setup/run/test commands and observed results: 
+  - From `project/`, `python -m pytest --collect-only -q tests/test_domain.py` collected 9 tests.
+  - `python -m pytest -q` passed 96.
+  - `python main.py` ran successfully.
+- Missing local file or setup gap / remedy and recheck: 
+  - No required setup file was missing locally.
+  - `requirements-dev.txt` exists and pins pytest 8.3.5.
 
 
 ## G Known limitations debt and release notes
@@ -248,13 +268,13 @@ One paragraph — If AI can write code why do we still need software engineers: 
 | FR-07 retained history test | [response] | Trung |
 | Actual AI change rejected/modified or honestly accepted with verification | [response] | Trung |
 | Unresolved limitation / future production work | [response] | Trung |
-| Personal implementation contribution | [response] | Sophie |
-| Personal test/review/design/integration contribution | [response] | Sophie |
-| PG agentic change and rescheduling verification | [response] | Sophie |
-| PG responsible-AI risk/remediation or supported no finding | [response] | Sophie |
+| Personal implementation contribution | Every stage, we have group Teams meeting to split tasks to group members then another group Teams meeting for finalise the stage. | Sophie, Hassan, Trung |
+| Personal test/review/design/integration contribution | Each member has run own tests when impletement functions in each stage, response for PR to main. Sophie as repository owner, review and merge each PR. | Sophie, Hassan, Trung |
+| PG agentic change and rescheduling verification | I scoped rescheduling to the RES requirements, then checked identity, participants, no-op, conflict, invalid status/time, non-mutation, old-slot reuse, and updated listing through focused tests. Stage 10 records 24 focused, 62 common, and 86 full tests passing on the working tree. | Sophie |
+| PG responsible-AI risk/remediation or supported no finding | I verified that unknown-practitioner errors echoed caller-supplied IDs, replaced the message with a generic error, and added checks that the ID is not included in service or menu output. I also added isolation/interaction tests where no production defect was found. Evidence records synthetic data and remaining course-policy/provenance limitations. | Sophie |
 
 Optional bounded-change practice only: validation rule, focused test, safe error-message change, explicit-input query or agreed status rule with test. Explain expected impact before editing, make a small change, run the test, and identify evidence to inspect if unsure. No live AI unless explicitly permitted. Preserve the submitted candidate.
 
-Practice question/change and reasoning: [response or not undertaken]
-Separate reflection / peer / common team viva evidence links and routing: [response]
+Practice question/change and reasoning: Not undertaken
+Separate reflection / peer / common team viva evidence links and routing: In separate 'Assignment_3_Reflection_Report_and_Peer_Evaluation'
 No further coding stage. Later corrections use the published assessment process.
