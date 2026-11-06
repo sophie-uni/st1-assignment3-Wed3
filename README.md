@@ -5,13 +5,16 @@ Baseline: Stage 6 foundation, 2026 revision 2. This starter deliberately leaves 
 
 ## Group index
 
-- Group and tutorial: [complete]
-- Member names, GitHub usernames and UG/PG cohorts: [complete]
+- Group and tutorial: Wednesday 14:30-16:30 Group 3 (st1-assignment3-Wed3)
+- Member names, GitHub usernames and UG/PG cohorts: Sophie Jiang (PG, 'sophie-uni Jingxian Jiang'), Hassan Ahmad (UG, 'Hassan-Ahmad-001 Hassan Ahmad'), Trung Hieu (UG, 'hieunguyee538 Trung Nguyen')
 - Shared repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
-- Latest completed stage: [complete]
-- Verified code SHA: [complete]
-- Test command, working directory and observed result: [complete]
-- Final submitted SHA, if different from tested code SHA: [complete; explain evidence-only changes]
+- Latest completed stage: stage12
+- Verified code SHA: `5c52cb731a26f32e577295f6c2ab5e48ce857fc6`
+- Test command, working directory and observed result: 
+  - Command: 'python -m pytest -q'
+  - Working directory: From project/
+  - Result: 96 passed in 0.14s
+- Final submitted SHA, if different from tested code SHA: Not applicable
 
 Do not put student IDs, private peer ratings, credentials or personal contact details here.
 

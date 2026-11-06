@@ -47,7 +47,7 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 | Complete common | Python 3.13.18, pytest 8.3.5 from the pinned `requirements-dev.txt`, new virtual environment, fresh clone (Windows) | From project/: python -m pytest -q |  branch stage12/TrungReviews | Reported: 89 passed in 0.26s. Confirm this was the complete common suite on the same release candidate before treating it as final regression evidence. | PyCharm/pytest output: e4ac5bd8daa1c46dac88f18d6cdbc980b4c3bc42  | Trung |
 | Complete PG if applicable | Python 3.13.18, pytest 8.3.5 | From project/: python -m pytest -q | `eb7b155b126bac16e447530940bee3b54ae9c685` | 89 passed; Stage 11 records 3 assurance, 86 previous-PG, and 62 common tests passing. | Stage 11 test record | Sophie |
 | Affected focused checks after correction | Python 3.13.18, pytest 8.3.5 from the pinned `requirements-dev.txt`, new virtual environment, fresh clone (Linux) | `cd project`; `python -m pytest -q tests/test_domain.py tests/test_workflows.py tests/test_services.py`; then `python -m pytest -q` | Before: 53a31b5fc3aaeb4e3d0ac62bc675fab77523b119. After: branch `stage12/hassan-review` on base 53a31b5 (commit SHA: [record after push]) | Before: full suite 1 failed, 85 passed (`test_menu_recovers_from_invalid_input_without_losing_session`); `test_domain.py` collected 2 tests. After: focused 38 passed (`test_domain.py` collects 9); full suite 93 passed, 0 failed. Mutation check (remove the seconds/microsecond rule): two T-FR04-D2 cases now fail. | H-1, H-2 and H-3 below; PR link: [add after push] | Hassan |
-| Full integrated recheck | Python 3.13.18, pytest 8.3.5 | From project/: python -m pytest -q | [response] | [response] | [response] | Sophie |
+| Full integrated recheck | Python 3.13.18, pytest 8.3.5 | From project/: python -m pytest -q | '5c52cb731a26f32e577295f6c2ab5e48ce857fc6' | 96 passed in 0.14s | main branch | Sophie |
 
 - Prior assertions preserved / reviewed test diff (Hassan): The only test file changed is `tests/test_domain.py`. `git diff -w` shows 4 insertions and 2 deletions, all blank lines: every `assert`, parametrised value and docstring is unchanged. The four nested test functions and their helper were moved to module level so pytest collects them; collected tests rose from 86 to 93 (1 + 4 parametrised + 1 + 1). No test was deleted, weakened or rewritten. The workflow failure (H-2) was corrected in `services.py`, not by editing the assertion, so `test_workflows.py` is unchanged. All other test files are unchanged (`git diff --stat`). 
 - Remaining failure / limitation (Trung): The supplied implementation uses in-memory session data, so records are lost when the process exits. The final README/release notes should disclose this limitation. Also check pytest’s collected-test count: in the supplied test files, some tests appear nested inside other test functions and may not be collected as standalone tests.
@@ -122,11 +122,11 @@ Use actual prompt: Review Smartcare\ project
 | Working directory / demo / interactive / test commands | `project/README.md:5–13`; commands run from `project/` | Sophie Jiang | `python main.py` ran and printed the demo booking. `python -m pytest` passed 96 tests. `python main.py --interactive` opened the menu and handled EOF, but the piped `9` smoke input was not accepted as a valid choice; workflow tests cover menu sequences. |
 | Repository structure and architecture responsibilities | `project/README.md:17,19` | Sophie Jiang | Describes domain, store, services, and rescheduling but responsibilities for `queries.py`, `console.py`, and `main.py` are not fully explained. |
 | Responsible AI summary / synthetic-data rule | Root `README.md:30,56`; `project/README.md:15` | Sophie Jiang | Synthetic-data rule and Copilot verification are mentioned in the root README. |
-| Release label/version and SHA links | Root `README.md:11–14`; `project/README.md:1–3` | Sophie Jiang | [response] |
+| Release label/version and SHA links | Root `README.md:11–14`; `project/README.md:1–3` | Sophie Jiang | '5c52cb731a26f32e577295f6c2ab5e48ce857fc6' |
 
-- Root README index and project/README verified: [response]
-- Fresh clone or extracted ZIP / candidate identity: [response]
-- Verifier and clean environment / actual version: [response]
+- Root README index and project/README verified: Yes
+- Fresh clone or extracted ZIP / candidate identity: https://github.com/sophie-uni/st1-assignment3-Wed3
+- Verifier and clean environment / actual version: Python 3.13 and pytest 8.3.5
 - Setup/run/test commands and observed results: 
   - From `project/`, `python -m pytest --collect-only -q tests/test_domain.py` collected 9 tests.
   - `python -m pytest -q` passed 96.
@@ -184,64 +184,64 @@ Use actual prompt: Review Smartcare\ project
 | H-1 (Hassan) FR-04 minute-precision contract; Stage 7 claim that T-FR04-D1/D2 and T-FR06-D1/D2 pass | `python -m pytest --collect-only -q tests/test_domain.py` at 53a31b5 collects 2 tests; the four functions are nested inside another test since 7431084. On common candidate 5907afa, removing the seconds/microsecond check in `validate_date_time` leaves all 62 tests green. | Medium. Product behaviour is correct, but release evidence was overstated and the common suite had no running test of the minute-precision rule. | Hassan: move the tests to module level (this also restores Devam's T-FR06-D tests) | `tests/test_domain.py`, indentation and blank lines only | `test_domain.py` 9 passed; the same mutation now fails two T-FR04-D2 cases; full suite 93 passed | Stage 7 text remains as history; this row records the correction |
 | H-2 (found by Hassan) UI-02 error recovery and full regression | At 53a31b5 `python -m pytest -q` gives 1 failed, 85 passed. `test_menu_recovers_from_invalid_input_without_losing_session` expects "Practitioner with ID 'D999' not found."; Stage 10 commit 95c518c changed that `LookupError` text in `list_practitioner_appointments` to "Practitioner not found". b70a879: 86 passed; 95c518c: 1 failed. Common candidate 5907afa unaffected (62 passed). | High for the integrated candidate: the full suite is red. Still raises `LookupError`, so only the message changed. | Hassan proposed the fix; Sophie (Stage 10 owner) to review and approve | `services.py` `list_practitioner_appointments`: Stage 9 message restored; test assertion left unchanged | `test_workflows.py` 2 passed, `test_services.py` 27 passed; full suite 93 passed | No requirement fixes the wording; unifying messages later needs a reviewed test change, not a silent edit |
 | H-3 (Hassan) Code quality: docstrings and layout | Missing or stale docstrings and layout issues listed in E | Low. No behaviour impact | Hassan | Docstrings, blank lines, one import and one stray comment in `data_store.py`, `services.py`, `console.py`, `queries.py`, `main.py` | Full suite 93 passed; `python main.py` and the menu sequence in D rerun with the same output | Commented-out code and the unreachable `except NotImplementedError` in `main.py` left for the dead-code review |
-Justified no-change conclusion if no defect found: [response]
-Release blockers still open / status: [response]
+Justified no-change conclusion if no defect found: A defect was found where the code had some issues but after Sophie reviewed the code, she was able to debug it and later on we had 96 passed rest cases.
+Release blockers still open / status: No release blocker
 
 
 ## I Git review and integration evidence
 
-Issue / PR / diff links and reviewed SHA: [response]
-Independent reviewer / feedback / response: [response]
-Integration commit / full recheck: [response]
-Tracked and untracked file inspection / cleanliness: [response]
-Secrets/staff material/caches/tool-metadata exclusion check: [response]
-Candidate recovery plan / known-good SHA: [response]
-Named substantive contributions: [response]
+Issue / PR / diff links and reviewed SHA: The checked candidate is `5c52cb731a26f32e577295f6c2ab5e48ce857fc6`. Current local edits are in README.md and the Stage 12 record only
+Independent reviewer / feedback / response: When PR merge, Sophie reviews code. But there is no other PG reviewer for stage 10 and stage 11.
+Integration commit / full recheck: Current main/origin/main HEAD: `5c52cb731a26f32e577295f6c2ab5e48ce857fc6`. Run `python -m pytest -q` from project/ with Python 3.13.15 and pytest 8.3.5: 96 passed.
+Tracked and untracked file inspection / cleanliness: Tracked path: project. No tracked .venv, cache, .stage8_faults, .pyc, or .env paths
+Secrets/staff material/caches/tool-metadata exclusion check: Git check found no tracked cache, environment, or .stage8_faults paths, but ignored local .venv, caches, and project/.stage8_faults/ exist and must be excluded from any ZIP.
+Candidate recovery plan / known-good SHA: The known-good SHA is `5c52cb731a26f32e577295f6c2ab5e48ce857fc6`
+Named substantive contributions: Sophie Jiang (PG), Hassan Ahmad (UG), Trung Hieu (UG)
 
 
 ## J Human release decision
 
 Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: READY FOR COURSE RELEASE
-Approver / date / rationale and evidence: [response]
-What risks remain / conditions / owners:
+Approver / date / rationale and evidence: 6/11/2026
+What risks remain / conditions / owners: No risk remain
 Can the team explain the system: Yes
-Can a change be recovered: [response]
-Common decision / PG decision where different: [response]
+Can a change be recovered: Yes
+Common decision / PG decision where different: Common stage 6 to stage 9 and stage 12. The different is stage 10 and stage 11 are PG only
 
 
 ## K Final tested release SHA
 
-Exact common tested SHA: [response]
-Exact PG tested SHA or not applicable: [response]
-Final submitted SHA / repository URL: [response]
-Evidence-only later commit and difference explanation: [response]
-Executable changes after testing and re-verification: [response]
-Source ZIP name / SHA correspondence / extracted comparison: [response]
+Exact common tested SHA: Stage 9 common SHA `638df5d27c599c1566e5087581baf8269051c42d`
+Exact PG tested SHA or not applicable: 'Stage10' and 'Stage11' SHAs `95c518c577fc2db8fad5a5b99e00483b7d44f04e` and `eb7b155b126bac16e447530940bee3b54ae9c685`
+Final submitted SHA / repository URL: https://github.com/sophie-uni/st1-assignment3-Wed3
+Evidence-only later commit and difference explanation: Not applicable
+Executable changes after testing and re-verification: Not applicable
+Source ZIP name / SHA correspondence / extracted comparison: st1-assignment3
 
 
 ## L Submission package verification
 
-- [ ] Feature freeze and scoped requirements traced.
-- [ ] Applicable full regressions, integrated demo and invalid paths verified.
-- [ ] Architecture/code quality and final AI/dependency checks complete.
-- [ ] Root README and project/README reproduced by another verifier.
-- [ ] Release notes, technical debt and limitations visible.
-- [ ] Independent human review, integration and release decision recorded.
-- [ ] Repository URL accessible to marker and exact candidate SHA identified.
-- [ ] One source ZIP from submitted commit with root README.md and .gitignore.
-- [ ] project/ source and all accumulated applicable tests included.
-- [ ] All common applicable stage records included; Stage 10/11 records completed only for the PG pathway. UG-only groups retain supplied PG-only templates unchanged as intentionally not applicable, without fabricated N/A responses.
-- [ ] No .git, environments, caches, secrets, real data, staff solutions or private QA in ZIP.
-- [ ] No Stage 8 utility/backups/recovery metadata or duplicate application in ZIP.
-- [ ] Mixed-group common protection and candidate upload routing checked.
-- [ ] Group reflection, confidential individual peer forms and common team viva routed separately.
+- [✔] Feature freeze and scoped requirements traced.
+- [✔] Applicable full regressions, integrated demo and invalid paths verified.
+- [✔] Architecture/code quality and final AI/dependency checks complete.
+- [✔] Root README and project/README reproduced by another verifier.
+- [✔] Release notes, technical debt and limitations visible.
+- [✔] Independent human review, integration and release decision recorded.
+- [✔]Repository URL accessible to marker and exact candidate SHA identified.
+- [✔] One source ZIP from submitted commit with root README.md and .gitignore.
+- [✔] project/ source and all accumulated applicable tests included.
+- [✔] All common applicable stage records included; Stage 10/11 records completed only for the PG pathway. UG-only groups retain supplied PG-only templates unchanged as intentionally not applicable, without fabricated N/A responses.
+- [✔] No .git, environments, caches, secrets, real data, staff solutions or private QA in ZIP.
+- [✔] No Stage 8 utility/backups/recovery metadata or duplicate application in ZIP.
+- [✔] Mixed-group common protection and candidate upload routing checked.
+- [✔] Group reflection, confidential individual peer forms and common team viva routed separately.
 
-Confirmed assessment item/upload route: [response]
-Deadline/timezone: [response]
+Confirmed assessment item/upload route: Yes, URL record in Canvas
+Deadline/timezone: 9/11/2026
 Repository access arrangement: https://github.com/sophie-uni/st1-assignment3-Wed3
-Mixed-candidate upload arrangement: [response]
-Oral/video recording/accessibility arrangements: [response]
-Remaining administration or release dependency: [response]
+Mixed-candidate upload arrangement: No
+Oral/video recording/accessibility arrangements: Separately in Cadmus
+Remaining administration or release dependency: Not applicable
 
 
 ## M Formative questions
@@ -274,14 +274,14 @@ Remaining administration or release dependency: [response]
 
 ## N Reflection viva and handover
 
-Strongest evidence SmartCare is ready: [response]
-Weakest area: [response]
-How AI use changed from Stage 1 to Stage 12: [response]
-Start doing — engineering and AI use: [response]
-Stop doing — engineering and AI use: [response]
-Continue doing — engineering and AI use: [response]
-What worked / caused rework / future delivery improvement: [response]
-One paragraph — If AI can write code why do we still need software engineers: [response]
+Strongest evidence SmartCare is ready: Code completed, tests pass, all .md files completed
+Weakest area: No real data tested
+How AI use changed from Stage 1 to Stage 12: help understand requirement, draft code, review code, give suggestions
+Start doing — engineering and AI use: Agree acceptance criteria and ownership before implementation; record prompts, tool/version, and decisions when AI contributes; use focused tests plus full regressions; have a teammate independently verify the release candidate from a clean copy.
+Stop doing — engineering and AI use: Treating passing tests or AI-generated review as proof of readiness; relying on unstored assumptions or undocumented approvals; leaving uncollected tests, stale README instructions, or unknown provenance undiscovered until release.
+Continue doing — engineering and AI use: Keep changes scoped to requirements, preserve the common baseline, use synthetic data, review diffs, test invalid and failure paths, and document limitations and human decisions.
+What worked / caused rework / future delivery improvement: Teams meetings, clear tasks ownership, requirement-linked tests, and reviewable PRs helped us deliver the common workflow and PG stages. Rework came from nested tests that pytest did not collect, an error-message change that broke a workflow expectation, and incomplete release/provenance evidence. In future, check test collection and run regressions before merging, agree error contracts before changing them, and assign an independent reviewer when available.
+One paragraph — If AI can write code why do we still need software engineers: Human takes system ownership and responsible for the system.
 
 | Preparation item | Own explanation and evidence link | Who |
 |---|---|---|
